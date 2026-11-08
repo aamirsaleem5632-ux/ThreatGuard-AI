@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #07111F;
+  --foreground: #F5F7FA;
+}
+
+body {
+  background-color: #07111F;
+  color: #F5F7FA;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Cyber Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #07111F;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #17283A;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #24D6E8;
+}
+
+/* Cyber Matrix Background Grid */
+.cyber-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(36, 214, 232, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(36, 214, 232, 0.04) 1px, transparent 1px);
+}
+
+.cyber-glow-cyan {
+  text-shadow: 0 0 10px rgba(36, 214, 232, 0.5);
+}
+
+.cyber-glow-gold {
+  text-shadow: 0 0 10px rgba(217, 174, 88, 0.5);
+}
+
+/* Scanning Line Animation */
+@keyframes cyberScan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+
+.animate-scan-line {
+  animation: cyberScan 6s linear infinite;
+}
