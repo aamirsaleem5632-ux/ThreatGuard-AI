@@ -24,7 +24,6 @@ class Settings(BaseSettings):
         "http://localhost:3001",
         "http://127.0.0.1:3000",
         "https://threatguard-ai.vercel.app",
-        "*"
     ]
     
     class Config:

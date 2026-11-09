@@ -5,6 +5,14 @@
 - **Backend**: Railway / Docker container with Uvicorn.
 - **Database**: Managed PostgreSQL.
 
+### Railway Backend
+- Set the Railway service root directory to `backend`.
+- The service uses `backend/Dockerfile` and `backend/railway.json`; the image runs Python 3.11 and binds Uvicorn to `0.0.0.0:$PORT`.
+- Add a Railway PostgreSQL service and set the backend's `DATABASE_URL` to its connection URL. Railway's local filesystem is ephemeral, so the default SQLite database is suitable only for local development or an explicitly persistent volume.
+- Set `CORS_ORIGINS` to a JSON array containing the exact frontend origin(s), including the deployed Vercel URL.
+- Set a unique, long random `SECRET_KEY` before exposing the service publicly.
+- After deployment, verify `https://<backend-domain>/api/health`.
+
 ## 2. Environment Variables
 ```env
 # Backend
@@ -13,11 +21,10 @@ GEMINI_API_KEY=your_gemini_api_key_here
 ABUSEIPDB_API_KEY=your_abuseipdb_key_here
 URLHAUS_API_KEY=your_urlhaus_key_here
 SECRET_KEY=threatguard-super-secret-key-change-in-prod
-ENVIRONMENT=development
-FRONTEND_URL=http://localhost:3000
+CORS_ORIGINS=["http://localhost:3000","https://threatguard-ai.vercel.app"]
 
 # Frontend
-NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
 ```
 
 ## 3. Quickstart Commands
@@ -26,7 +33,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 cd backend
 python -m venv venv
 venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements-railway.txt
 uvicorn app.main:app --reload --port 8000
 
 # Frontend
