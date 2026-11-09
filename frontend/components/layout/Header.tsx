@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/context/LanguageContext';
+import LanguageSelector from '@/components/layout/LanguageSelector';
 import {
   Search,
   Bell,
   Building2,
   ShieldCheck,
   Zap,
-  UserCheck,
   Sparkles,
-  CheckCircle2
+  ChevronDown
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -19,9 +20,25 @@ interface HeaderProps {
 }
 
 export default function Header({ onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
+  return (
+    <Suspense fallback={
+      <header className="h-16 bg-[#030305]/90 border-b border-purple-500/15 ml-72" />
+    }>
+      <HeaderInner
+        onOpenQuickInvestigate={onOpenQuickInvestigate}
+        onToggleAssistant={onToggleAssistant}
+      />
+    </Suspense>
+  );
+}
+
+function HeaderInner({ onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [activeFilterTeam, setActiveFilterTeam] = useState('Global SOC');
+  const [activeFilterRegion, setActiveFilterRegion] = useState('Asia Pacific');
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,105 +47,133 @@ export default function Header({ onOpenQuickInvestigate, onToggleAssistant }: He
   };
 
   return (
-    <header className="h-16 bg-cyber-deep/90 backdrop-blur border-b border-cyber-card flex items-center justify-between px-6 sticky top-0 z-30 ml-72">
-      {/* Search Input Bar */}
-      <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl">
-        <div className="relative">
-          <Search className="w-4 h-4 text-cyber-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search indicator (IP, Domain, Hash), CVE-2024-..., or alert ID..."
-            className="w-full bg-cyber-card/80 border border-cyber-card rounded-lg pl-10 pr-24 py-2 text-xs text-cyber-white placeholder-cyber-muted focus:outline-none focus:border-cyber-cyan focus:ring-1 focus:ring-cyber-cyan font-mono transition-all"
-          />
-          <button
-            type="submit"
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-cyber-cyan/15 hover:bg-cyber-cyan/30 text-cyber-cyan border border-cyber-cyan/40 px-2 py-0.5 rounded text-[11px] font-mono transition-colors"
-          >
-            Investigate
-          </button>
+    <header className="h-16 bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between px-6 sticky top-0 z-30 ml-72 select-none">
+      {/* Left side: SOC Quick Filters & Search */}
+      <div className="flex items-center space-x-3 flex-1 max-w-2xl">
+        {/* SOC Filter Chips */}
+        <div className="hidden 2xl:flex items-center space-x-2 text-[11px] font-mono">
+          <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#0B0A10] border border-purple-500/15 text-zinc-400 hover:text-white transition-colors cursor-pointer">
+            <span className="text-purple-300 font-semibold">Team:</span>
+            <span>{activeFilterTeam}</span>
+            <ChevronDown className="w-3 h-3 text-zinc-500" />
+          </div>
+
+          <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#0B0A10] border border-purple-500/15 text-zinc-400 hover:text-white transition-colors cursor-pointer">
+            <span className="text-violet-300 font-semibold">Region:</span>
+            <span>{activeFilterRegion}</span>
+            <ChevronDown className="w-3 h-3 text-zinc-500" />
+          </div>
         </div>
-      </form>
+
+        {/* Search Input Bar */}
+        <form onSubmit={handleSearchSubmit} className="flex-1">
+          <div className="relative">
+            <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('header.searchPlaceholder', 'Search indicator (IP, Domain, Hash), CVE-2024-..., or alert ID...')}
+              className="w-full bg-[#0B0A10] border border-purple-500/15 rounded-lg pl-10 pr-24 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/40 font-mono transition-all"
+            />
+            <button
+              type="submit"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-purple-950/60 hover:bg-purple-900/60 text-purple-200 border border-purple-500/30 px-2 py-0.5 rounded text-[11px] font-mono transition-colors"
+            >
+              {t('header.investigate', 'Investigate')}
+            </button>
+          </div>
+        </form>
+      </div>
 
       {/* Right Controls */}
-      <div className="flex items-center space-x-4">
-        {/* Organization Badge */}
-        <div className="hidden lg:flex items-center space-x-2 bg-cyber-card border border-cyber-card px-3 py-1.5 rounded-lg text-xs">
-          <Building2 className="w-3.5 h-3.5 text-cyber-gold" />
-          <span className="text-cyber-white font-medium">Global Defense Financial</span>
-          <span className="text-[10px] font-mono text-cyber-cyan bg-cyber-cyan/10 px-1.5 py-0.2 rounded border border-cyber-cyan/30">Tier 1</span>
+      <div className="flex items-center space-x-3.5 pl-4">
+        {/* Organization Tier Badge */}
+        <div className="hidden lg:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/15 px-3 py-1.5 rounded-lg text-xs">
+          <Building2 className="w-3.5 h-3.5 text-purple-400" />
+          <span className="text-white font-medium">Global Defense</span>
+          <span className="text-[10px] font-mono text-purple-300 bg-purple-950/50 px-1.5 py-0.2 rounded border border-purple-500/30">
+            {t('header.tier1', 'Tier 1')}
+          </span>
         </div>
 
         {/* Posture Score Pill */}
-        <div className="flex items-center space-x-2 bg-cyber-card border border-cyber-turquoise/30 px-3 py-1.5 rounded-lg text-xs shadow-cyber-cyan">
-          <ShieldCheck className="w-4 h-4 text-cyber-turquoise" />
-          <span className="text-cyber-muted">Posture:</span>
-          <span className="text-cyber-white font-mono font-bold">78.5%</span>
-          <span className="w-2 h-2 rounded-full bg-cyber-turquoise animate-pulse"></span>
+        <div className="flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/20 px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(147,51,234,0.15)]">
+          <ShieldCheck className="w-4 h-4 text-purple-400" />
+          <span className="text-zinc-400 hidden sm:inline">{t('header.posture', 'Posture')}:</span>
+          <span className="text-white font-mono font-bold">78.5%</span>
+          <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
         </div>
 
         {/* Run Investigation Action Button */}
         <button
           onClick={onOpenQuickInvestigate}
-          className="flex items-center space-x-1.5 bg-gradient-to-r from-cyber-cyan/20 to-cyber-turquoise/20 hover:from-cyber-cyan/30 hover:to-cyber-turquoise/30 text-cyber-cyan border border-cyber-cyan/50 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-cyber-cyan transition-all"
+          className="hidden md:flex items-center space-x-1.5 bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all"
         >
-          <Zap className="w-3.5 h-3.5 fill-cyber-cyan" />
-          <span>New Investigation</span>
+          <Zap className="w-3.5 h-3.5 fill-purple-500 text-purple-400" />
+          <span>{t('header.newInvestigation', 'New Investigation')}</span>
         </button>
 
         {/* AI Assistant Toggle Button */}
         <button
           onClick={onToggleAssistant}
-          className="flex items-center space-x-1.5 bg-cyber-card hover:bg-cyber-elevated text-cyber-gold border border-cyber-gold/40 px-3 py-1.5 rounded-lg text-xs font-medium shadow-cyber-gold transition-colors"
+          className="flex items-center space-x-1.5 bg-[#0B0A10] hover:bg-[#0F0E18] text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs font-medium shadow-[0_0_15px_rgba(147,51,234,0.15)] transition-colors"
         >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">AI Copilot</span>
+          <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+          <span className="hidden sm:inline">{t('header.aiCopilot', 'AI Copilot')}</span>
         </button>
 
         {/* Notification Bell */}
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="w-9 h-9 rounded-lg bg-cyber-card border border-cyber-card hover:border-cyber-cyan flex items-center justify-center text-cyber-muted hover:text-cyber-white transition-colors relative"
+            aria-label="SOC Notifications"
+            className="w-9 h-9 rounded-lg bg-[#0B0A10] border border-purple-500/15 hover:border-purple-500/40 flex items-center justify-center text-zinc-400 hover:text-white transition-colors relative"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyber-critical animate-ping"></span>
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyber-critical"></span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 bg-cyber-elevated border border-cyber-card rounded-xl p-4 shadow-2xl z-50 animate-in fade-in zoom-in-95">
-              <div className="flex items-center justify-between pb-2 border-b border-cyber-card mb-3">
-                <span className="text-xs font-semibold text-cyber-white uppercase tracking-wider font-mono">SOC Notifications</span>
-                <span className="text-[10px] font-mono text-cyber-critical bg-cyber-critical/20 px-1.5 py-0.5 rounded border border-cyber-critical/40">3 Critical</span>
+            <div className="absolute right-0 mt-2 w-80 bg-[#0F0E18] border border-purple-500/20 rounded-xl p-4 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+              <div className="flex items-center justify-between pb-2 border-b border-purple-500/15 mb-3">
+                <span className="text-xs font-semibold text-white uppercase tracking-wider font-mono">
+                  {t('header.notifications', 'SOC Notifications')}
+                </span>
+                <span className="text-[10px] font-mono text-rose-400 bg-rose-950/50 px-1.5 py-0.5 rounded border border-rose-500/40">
+                  3 {t('header.criticalAlerts', 'Critical')}
+                </span>
               </div>
               <div className="space-y-2 text-xs">
-                <div className="p-2.5 rounded-lg bg-cyber-card border-l-2 border-cyber-critical">
-                  <div className="font-semibold text-cyber-white">C2 Beaconing Detected</div>
-                  <div className="text-cyber-muted text-[11px] mt-0.5">Egress traffic to 185.220.101.5 flagged by AbuseIPDB sensor.</div>
+                <div className="p-2.5 rounded-lg bg-[#0B0A10] border-l-2 border-rose-500">
+                  <div className="font-semibold text-white">C2 Beaconing Detected</div>
+                  <div className="text-zinc-400 text-[11px] mt-0.5">Egress traffic to 185.220.101.5 flagged by AbuseIPDB sensor.</div>
                 </div>
-                <div className="p-2.5 rounded-lg bg-cyber-card border-l-2 border-cyber-gold">
-                  <div className="font-semibold text-cyber-white">Human Approval Pending</div>
-                  <div className="text-cyber-muted text-[11px] mt-0.5">Remediation Agent requests firewall block on malicious-c2-update.org.</div>
+                <div className="p-2.5 rounded-lg bg-[#0B0A10] border-l-2 border-purple-600">
+                  <div className="font-semibold text-white">Human Approval Pending</div>
+                  <div className="text-zinc-400 text-[11px] mt-0.5">Remediation Agent requests firewall block on malicious-c2-update.org.</div>
                 </div>
-                <div className="p-2.5 rounded-lg bg-cyber-card border-l-2 border-cyber-cyan">
-                  <div className="font-semibold text-cyber-white">CVE-2024-21413 Monitored</div>
-                  <div className="text-cyber-muted text-[11px] mt-0.5">EPSS score 0.785 patch candidate identified.</div>
+                <div className="p-2.5 rounded-lg bg-[#0B0A10] border-l-2 border-violet-500">
+                  <div className="font-semibold text-white">CVE-2024-21413 Monitored</div>
+                  <div className="text-zinc-400 text-[11px] mt-0.5">EPSS score 0.785 patch candidate identified.</div>
                 </div>
               </div>
             </div>
           )}
         </div>
 
+        {/* TOP-RIGHT LANGUAGE SELECTOR WIDGET */}
+        <LanguageSelector />
+
         {/* User Profile */}
-        <div className="flex items-center space-x-2 pl-2 border-l border-cyber-card">
-          <div className="w-8 h-8 rounded-lg bg-cyber-card border border-cyber-gold/40 flex items-center justify-center text-cyber-gold font-bold text-xs font-mono">
+        <div className="flex items-center space-x-2 pl-2 border-l border-purple-500/15">
+          <div className="w-8 h-8 rounded-lg bg-[#0B0A10] border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold text-xs font-mono shadow-[0_0_12px_rgba(147,51,234,0.2)]">
             EA
           </div>
           <div className="hidden xl:block">
-            <div className="text-xs font-medium text-cyber-white">Esha Amir Choudhary</div>
-            <div className="text-[10px] text-cyber-muted font-mono">Super Administrator</div>
+            <div className="text-xs font-medium text-white">Esha Amir Choudhary</div>
+            <div className="text-[10px] text-zinc-400 font-mono">{t('header.superAdmin', 'Super Administrator')}</div>
           </div>
         </div>
       </div>

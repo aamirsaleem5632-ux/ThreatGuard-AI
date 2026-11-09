@@ -1,52 +1,113 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #07111F;
-  --foreground: #F5F7FA;
+  --background: #030305;
+  --foreground: #FFFFFF;
 }
 
 body {
-  background-color: #07111F;
-  color: #F5F7FA;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #030305;
+  color: #FFFFFF;
+  font-family: 'Clash Display', 'Inter', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
 }
 
-/* Custom Cyber Scrollbar */
+/* Custom Obsidian Purple Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #07111F;
+  background: #030305;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #17283A;
+  background: #1A1530;
   border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #24D6E8;
+  background: #A855F7;
 }
 
-/* Cyber Matrix Background Grid */
+/* Cyber Matrix Background Grid — Obsidian Deep Black & Purple Ambient Tint */
 .cyber-grid-pattern {
   background-size: 40px 40px;
   background-image: 
-    linear-gradient(to right, rgba(36, 214, 232, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(36, 214, 232, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(147, 51, 234, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(147, 51, 234, 0.03) 1px, transparent 1px);
 }
 
-.cyber-glow-cyan {
-  text-shadow: 0 0 10px rgba(36, 214, 232, 0.5);
+.cyber-grid-dots {
+  background-image: radial-gradient(rgba(147, 51, 234, 0.10) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-.cyber-glow-gold {
-  text-shadow: 0 0 10px rgba(217, 174, 88, 0.5);
+/* Glowing effects — Subtle High-End Purple Ambient Glow */
+.cyber-glow-cyan,
+.cyber-glow-gold,
+.cyber-glow-purple {
+  text-shadow: 0 0 14px rgba(147, 51, 234, 0.60);
+}
+
+.gold-gradient-text,
+.cyan-gradient-text,
+.purple-gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #C084FC 50%, #A855F7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Frosted Glassmorphism Cards — Elevated Dark Obsidian with purple border */
+.cyber-glass {
+  background: rgba(11, 10, 16, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(147, 51, 234, 0.15);
+}
+
+.cyber-glass-gold,
+.cyber-glass-cyan,
+.cyber-glass-purple {
+  background: linear-gradient(180deg, rgba(147, 51, 234, 0.12) 0%, rgba(11, 10, 16, 0.95) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(147, 51, 234, 0.20);
+}
+
+/* High-tech 3D Shield Aura & Purple Ambient Glow */
+.shield-glow-effect {
+  position: relative;
+}
+.shield-glow-effect::before {
+  content: '';
+  position: absolute;
+  inset: -15px;
+  background: radial-gradient(circle, rgba(147, 51, 234, 0.22) 0%, rgba(109, 40, 217, 0.12) 50%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  filter: blur(25px);
+  animation: pulseSlow 4s ease-in-out infinite;
+}
+
+/* Ethereal Iridescent Smoke Glow (Deep Purple-to-Violet to Deep Obsidian) */
+.clash-smoke-gradient {
+  background: radial-gradient(circle at 50% 30%, rgba(147, 51, 234, 0.20) 0%, rgba(109, 40, 217, 0.12) 35%, rgba(3, 3, 5, 0.98) 75%);
+}
+
+/* Audio Waveform / Attack Volume histogram bars */
+@keyframes waveBarAnim {
+  0%, 100% { height: 25%; }
+  50% { height: 95%; }
+}
+
+.animate-wave-bar {
+  animation: waveBarAnim 2s ease-in-out infinite;
 }
 
 /* Scanning Line Animation */
@@ -60,7 +121,7 @@ body {
 }
 
 /* ============================================================
-   Animate-In Utilities (tailwindcss-animate compatible fallback)
+   Animate-In Utilities
    ============================================================ */
 
 @keyframes fadeIn {
@@ -93,23 +154,17 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* animate-in base class */
 .animate-in {
   animation-fill-mode: both;
 }
 
-/* Duration modifiers */
+.duration-150 { animation-duration: 150ms; }
 .duration-200 { animation-duration: 200ms; }
 .duration-300 { animation-duration: 300ms; }
 .duration-500 { animation-duration: 500ms; }
 
-/* Fade-in */
 .fade-in { animation-name: fadeIn; }
-
-/* Zoom-in */
 .zoom-in-95 { animation-name: zoomIn95; }
-
-/* Slide-in modifiers (direction) */
 .slide-in-from-right { animation-name: slideInFromRight; }
 .slide-in-from-left  { animation-name: slideInFromLeft; }
 .slide-in-from-top   { animation-name: slideInFromTop; }

@@ -1,18 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { motion } from 'motion/react';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import AIAssistantDrawer from '@/components/assistant/AIAssistantDrawer';
 import QuickInvestigationModal from '@/components/investigation/QuickInvestigationModal';
+import ThreatIntelSidebar from '@/components/dashboard/ThreatIntelSidebar';
+import LanguageSelector from '@/components/layout/LanguageSelector';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ShieldAlert,
   ArrowRight,
-  Terminal,
-  ExternalLink,
-  Bot
+  Bot,
+  Radar
 } from 'lucide-react';
 
 const MARKETING_ROUTES = [
@@ -26,84 +30,125 @@ const MARKETING_ROUTES = [
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#030305] flex items-center justify-center font-mono text-zinc-400">
+        Loading...
+      </div>
+    }>
+      <AppShellInner>{children}</AppShellInner>
+    </Suspense>
+  );
+}
+
+function AppShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isQuickInvestigateOpen, setIsQuickInvestigateOpen] = useState(false);
+  const [showIntelRail, setShowIntelRail] = useState(false);
 
   const isMarketing = MARKETING_ROUTES.includes(pathname);
 
+  const handleToggleIntelRail = () => {
+    const next = !showIntelRail;
+    setShowIntelRail(next);
+    // Trigger smooth WebGL Threat Globe camera re-center transition
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('threatguard:toggle-radar-rail', { detail: { open: next } })
+      );
+    }
+  };
+
   if (isMarketing) {
     return (
-      <div className="min-h-screen bg-cyber-deep text-cyber-white cyber-grid-pattern flex flex-col">
-        {/* Public Marketing Header */}
-        <header className="h-20 border-b border-cyber-card/80 bg-cyber-deep/80 backdrop-blur-md sticky top-0 z-50 px-6 lg:px-12 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-cyber-navy border border-cyber-cyan/50 flex items-center justify-center shadow-cyber-cyan">
-              <ShieldAlert className="w-6 h-6 text-cyber-cyan" />
+      <div className="min-h-screen bg-[#030305] text-white cyber-grid-pattern flex flex-col">
+        {/* Public Marketing Header with Obsidian Purple theme + Language Selector */}
+        <header className="h-20 border-b border-purple-500/15 bg-[#030305]/85 backdrop-blur-xl sticky top-0 z-50 px-6 lg:px-12 flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#080714] border border-purple-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(147,51,234,0.25)] group-hover:border-purple-500/50 transition-colors">
+              <ShieldAlert className="w-6 h-6 text-purple-400" />
             </div>
             <div>
-              <span className="font-bold text-lg text-cyber-white tracking-wider flex items-center gap-1.5">
-                THREATGUARD <span className="text-cyber-cyan text-xs font-mono bg-cyber-cyan/15 px-1.5 py-0.5 rounded border border-cyber-cyan/30">AI</span>
+              <span className="font-bold text-lg text-white tracking-wider flex items-center gap-1.5">
+                THREATGUARD <span className="text-purple-300 text-xs font-mono bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/30">AI</span>
               </span>
-              <p className="text-[11px] text-cyber-muted font-mono">Autonomous Threat Intelligence</p>
+              <p className="text-[11px] text-zinc-400 font-mono">Autonomous Threat Intelligence</p>
             </div>
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-6 text-xs font-mono">
-            <Link href="/" className={`hover:text-cyber-cyan transition-colors ${pathname === '/' ? 'text-cyber-cyan font-bold' : 'text-cyber-muted'}`}>
-              Home
+          <nav className="hidden lg:flex items-center space-x-6 text-xs font-mono">
+            <Link href="/" className={`hover:text-purple-300 transition-colors ${pathname === '/' ? 'text-purple-300 font-bold' : 'text-zinc-400'}`}>
+              {t('nav.home', 'Home')}
             </Link>
-            <Link href="/platform" className={`hover:text-cyber-cyan transition-colors ${pathname === '/platform' ? 'text-cyber-cyan font-bold' : 'text-cyber-muted'}`}>
-              Platform Overview
+            <Link href="/platform" className={`hover:text-purple-300 transition-colors ${pathname === '/platform' ? 'text-purple-300 font-bold' : 'text-zinc-400'}`}>
+              {t('nav.platform', 'Platform Overview')}
             </Link>
-            <Link href="/solutions" className={`hover:text-cyber-cyan transition-colors ${pathname === '/solutions' ? 'text-cyber-cyan font-bold' : 'text-cyber-muted'}`}>
-              12 Solutions
+            <Link href="/solutions" className={`hover:text-purple-300 transition-colors ${pathname === '/solutions' ? 'text-purple-300 font-bold' : 'text-zinc-400'}`}>
+              {t('nav.solutions', '12 Domains')}
             </Link>
-            <Link href="/ai-security" className={`hover:text-cyber-cyan transition-colors ${pathname === '/ai-security' ? 'text-cyber-cyan font-bold' : 'text-cyber-muted'}`}>
-              Agentic AI & MCP
+            <Link href="/ai-security" className={`hover:text-purple-300 transition-colors ${pathname === '/ai-security' ? 'text-purple-300 font-bold' : 'text-zinc-400'}`}>
+              {t('nav.aiSecurity', 'Agentic AI & MCP')}
             </Link>
-            <Link href="/threat-intel" className={`hover:text-cyber-cyan transition-colors ${pathname === '/threat-intel' ? 'text-cyber-cyan font-bold' : 'text-cyber-muted'}`}>
-              Threat Intel
+            <Link href="/threat-intel" className={`hover:text-purple-300 transition-colors ${pathname === '/threat-intel' ? 'text-purple-300 font-bold' : 'text-zinc-400'}`}>
+              {t('nav.threatIntel', 'Threat Intel')}
             </Link>
-            <Link href="/architecture" className={`hover:text-cyber-cyan transition-colors ${pathname === '/architecture' ? 'text-cyber-cyan font-bold' : 'text-cyber-muted'}`}>
-              Architecture
+            <Link href="/architecture" className={`hover:text-purple-300 transition-colors ${pathname === '/architecture' ? 'text-purple-300 font-bold' : 'text-zinc-400'}`}>
+              {t('nav.architecture', 'Architecture')}
             </Link>
           </nav>
 
-          {/* Action CTAs */}
+          {/* Action CTAs + Top-Right Language Selector */}
           <div className="flex items-center space-x-3">
             <Link
               href="/contact"
-              className="hidden sm:inline-block px-4 py-2 rounded-lg text-xs font-mono text-cyber-white/80 hover:text-cyber-cyan transition-colors"
+              className="hidden sm:inline-block px-3.5 py-2 rounded-lg text-xs font-mono text-zinc-300 hover:text-purple-300 transition-colors"
             >
-              Request Demo
+              {t('nav.contact', 'Request Demo')}
             </Link>
-            <Link
-              href="/command-center"
-              className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyber-cyan/25 to-cyber-turquoise/25 hover:from-cyber-cyan/35 hover:to-cyber-turquoise/35 text-cyber-cyan border border-cyber-cyan/50 text-xs font-mono font-semibold shadow-cyber-cyan transition-all"
-            >
-              <span>Launch SOC Command</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                href="/command-center"
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 text-xs font-mono font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all"
+              >
+                <span>{t('nav.commandCenter', 'Launch SOC Command')}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </motion.div>
+
+            {/* Top-Right Language Selector */}
+            <LanguageSelector />
           </div>
         </header>
 
         {/* Marketing Page Content */}
-        <main className="flex-1">{children}</main>
+        <main className="flex-1">
+          <ErrorBoundary name="MarketingContent">
+            <Suspense fallback={
+              <div className="min-h-[50vh] flex items-center justify-center font-mono text-zinc-400">
+                Loading...
+              </div>
+            }>
+              {children}
+            </Suspense>
+          </ErrorBoundary>
+        </main>
 
         {/* Public Marketing Footer */}
-        <footer className="border-t border-cyber-card bg-cyber-navy/50 py-12 px-6 lg:px-12 text-xs font-mono text-cyber-muted">
+        <footer className="border-t border-purple-500/15 bg-[#080714]/70 py-12 px-6 lg:px-12 text-xs font-mono text-zinc-400">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center space-x-3">
-              <ShieldAlert className="w-5 h-5 text-cyber-cyan" />
-              <span>ThreatGuard AI © 2026. Built by Esha Amir Choudhary & Kahaf.</span>
+              <ShieldAlert className="w-5 h-5 text-purple-400" />
+              <span>ThreatGuard AI © 2026. Built by Esha Amir Choudhary & Dur e Kahaf.</span>
             </div>
             <div className="flex items-center space-x-6 text-[11px]">
-              <Link href="/platform" className="hover:text-cyber-cyan">Architecture</Link>
-              <Link href="/solutions" className="hover:text-cyber-cyan">12 Domains</Link>
-              <Link href="/ai-security" className="hover:text-cyber-cyan">Multi-Agent SOAR</Link>
-              <Link href="/command-center" className="text-cyber-cyan font-bold">SOC Dashboard</Link>
+              <Link href="/platform" className="hover:text-purple-300">Architecture</Link>
+              <Link href="/solutions" className="hover:text-purple-300">12 Domains</Link>
+              <Link href="/ai-security" className="hover:text-purple-300">Multi-Agent SOAR</Link>
+              <Link href="/command-center" className="text-purple-300 font-bold">SOC Dashboard</Link>
             </div>
           </div>
         </footer>
@@ -111,26 +156,85 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Authenticated SOC Dashboard Experience
+  // Authenticated SOC Dashboard Experience with Graphical Sidebar Support
   return (
-    <div className="min-h-screen bg-cyber-deep text-cyber-white flex">
+    <div className="min-h-screen bg-[#030305] text-white flex">
       <Sidebar />
+
       <div className="flex-1 flex flex-col min-w-0">
         <Header
           onOpenQuickInvestigate={() => setIsQuickInvestigateOpen(true)}
-          onToggleAssistant={() => setIsAssistantOpen(prev => !prev)}
+          onToggleAssistant={() => setIsAssistantOpen((prev) => !prev)}
         />
-        <main className="flex-1 p-6 ml-72 overflow-x-hidden">{children}</main>
+
+        <div className="flex-1 flex min-w-0">
+          <main className="flex-1 p-6 ml-72 overflow-x-hidden min-w-0">
+            <ErrorBoundary name="DashboardContent">
+              <Suspense fallback={
+                <div className="min-h-[50vh] flex items-center justify-center font-mono text-zinc-400">
+                  Loading...
+                </div>
+              }>
+                {children}
+              </Suspense>
+            </ErrorBoundary>
+          </main>
+
+          {/* Graphical Statistics Presentation Sidebar (Optional toggleable rail) */}
+          {showIntelRail && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+              className="hidden xl:block h-[calc(100vh-4rem)] sticky top-16 z-20"
+            >
+              <ThreatIntelSidebar
+                isCollapsible
+                onManualRefresh={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(
+                      new CustomEvent('threatguard:toggle-radar-rail', { detail: { open: true } })
+                    );
+                  }
+                }}
+              />
+            </motion.div>
+          )}
+        </div>
       </div>
 
-      {/* Floating AI Assistant Trigger Pill */}
-      <button
-        onClick={() => setIsAssistantOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center space-x-2 px-4 py-2.5 rounded-full bg-cyber-elevated/90 hover:bg-cyber-card border border-cyber-gold/50 text-cyber-gold shadow-cyber-gold text-xs font-semibold backdrop-blur-md transition-all hover:scale-105"
-      >
-        <Bot className="w-4 h-4 text-cyber-gold" />
-        <span>Ask Domain Copilot</span>
-      </button>
+      {/* Floating Buttons: Threat Telemetry Rail & AI Copilot */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+        {/* Toggle Graphical Telemetry Rail (Hooks up WebGL camera transition) */}
+        <motion.button
+          whileHover={{ scale: 1.05, boxShadow: '0 0 22px rgba(147, 51, 234, 0.40)' }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleToggleIntelRail}
+          title="Toggle Graphical Threat Radar Rail"
+          className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-full border text-xs font-semibold backdrop-blur-md transition-all shadow-lg ${
+            showIntelRail
+              ? 'bg-purple-950/60 border-purple-500/50 text-purple-200 shadow-[0_0_20px_rgba(147,51,234,0.3)]'
+              : 'bg-[#0F0E18]/90 border-purple-500/20 text-zinc-400 hover:text-purple-300 hover:border-purple-500/40'
+          }`}
+        >
+          <Radar className="w-4 h-4 text-purple-400 animate-spin-slow" />
+          <span className="hidden sm:inline font-mono">
+            {showIntelRail ? 'Hide Radar Rail' : 'Threat Radar Rail'}
+          </span>
+        </motion.button>
+
+        {/* AI Assistant Trigger Pill */}
+        <motion.button
+          whileHover={{ scale: 1.05, boxShadow: '0 0 25px rgba(147, 51, 234, 0.45)' }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsAssistantOpen(true)}
+          className="flex items-center space-x-2 px-4 py-2.5 rounded-full bg-[#0F0E18]/90 hover:bg-[#0B0A10] border border-purple-500/30 text-purple-300 shadow-[0_0_20px_rgba(147,51,234,0.25)] text-xs font-semibold backdrop-blur-md transition-all"
+        >
+          <Bot className="w-4 h-4 text-purple-400" />
+          <span>Ask Domain Copilot</span>
+        </motion.button>
+      </div>
 
       {/* AI Assistant Drawer */}
       <AIAssistantDrawer

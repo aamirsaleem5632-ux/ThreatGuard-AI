@@ -1,13 +1,9 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import Link from 'next/link';
 import {
-  Radio,
-  Database,
   ExternalLink,
-  ShieldCheck,
-  CheckCircle2,
   ArrowRight
 } from 'lucide-react';
 
@@ -23,10 +19,10 @@ export default function ThreatIntelPage() {
   return (
     <div className="space-y-12 py-12 px-6 lg:px-12 max-w-7xl mx-auto">
       <div className="space-y-3 max-w-3xl">
-        <h1 className="text-3xl sm:text-5xl font-extrabold text-cyber-white tracking-tight">
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
           External Threat Intelligence Feeds
         </h1>
-        <p className="text-sm text-cyber-muted font-mono leading-relaxed">
+        <p className="text-sm text-zinc-400 font-mono leading-relaxed">
           ThreatGuard AI integrates leading open and commercial cybersecurity intelligence sources, normalizing threat telemetry into a unified forensic evidence graph.
         </p>
       </div>
@@ -35,23 +31,23 @@ export default function ThreatIntelPage() {
         {FEEDS.map((feed, idx) => (
           <div
             key={idx}
-            className="p-5 rounded-2xl bg-cyber-card border border-cyber-card flex flex-col md:flex-row md:items-center justify-between gap-4"
+            className="p-5 rounded-2xl bg-[#0B0A10] border border-purple-500/15 flex flex-col md:flex-row md:items-center justify-between gap-4"
           >
             <div className="space-y-1.5">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-bold text-cyber-white">{feed.name}</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyber-deep border border-cyber-cyan/30 text-cyber-cyan">
+                <span className="text-sm font-bold text-white">{feed.name}</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#030305] border border-purple-500/25 text-purple-300">
                   {feed.status}
                 </span>
               </div>
-              <p className="text-xs text-cyber-muted max-w-2xl">{feed.desc}</p>
+              <p className="text-xs text-zinc-400 max-w-2xl">{feed.desc}</p>
             </div>
 
             <a
               href={feed.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-mono text-cyber-muted hover:text-cyber-cyan flex items-center gap-1.5 self-start md:self-center"
+              className="text-xs font-mono text-zinc-400 hover:text-purple-300 flex items-center gap-1.5 self-start md:self-center transition-colors"
             >
               <span>Official Specs</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -63,7 +59,7 @@ export default function ThreatIntelPage() {
       <div className="pt-6">
         <Link
           href="/threat-intelligence"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyber-cyan text-cyber-deep font-bold font-mono text-xs shadow-cyber-cyan hover:bg-cyber-cyan/90 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 font-bold font-mono text-xs shadow-[0_0_15px_rgba(201,168,68,0.2)] transition-all"
         >
           <span>Open Threat Intelligence Workspace</span>
           <ArrowRight className="w-4 h-4" />

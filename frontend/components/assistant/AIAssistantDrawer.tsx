@@ -7,11 +7,7 @@ import {
   Send,
   Bot,
   User,
-  ShieldCheck,
-  ChevronDown,
-  Terminal,
-  RotateCcw,
-  CheckCircle2
+  Terminal
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -105,32 +101,32 @@ export default function AIAssistantDrawer({
   const currentAssistant = ASSISTANT_OPTIONS.find(a => a.id === selectedDomain) || ASSISTANT_OPTIONS[0];
 
   return (
-    <div className="fixed inset-y-0 right-0 w-[440px] bg-cyber-elevated/95 backdrop-blur-xl border-l border-cyber-card shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-y-0 right-0 w-[440px] bg-[#0F0E18]/95 backdrop-blur-xl border-l border-purple-500/20 shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300">
       {/* Header */}
-      <div className="p-4 border-b border-cyber-card flex items-center justify-between bg-cyber-deep/80">
+      <div className="p-4 border-b border-purple-500/15 flex items-center justify-between bg-[#030305]/80">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-cyber-card border border-cyber-gold/40 flex items-center justify-center text-cyber-gold shadow-cyber-gold">
+          <div className="w-8 h-8 rounded-lg bg-[#0B0A10] border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(147,51,234,0.2)]">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-semibold text-cyber-white tracking-wide">
+            <div className="text-xs font-semibold text-white tracking-wide">
               {currentAssistant.name}
             </div>
-            <div className="text-[10px] text-cyber-cyan font-mono">{currentAssistant.domain}</div>
+            <div className="text-[10px] text-purple-300 font-mono">{currentAssistant.domain}</div>
           </div>
         </div>
 
         <button
           onClick={onClose}
-          className="w-7 h-7 rounded-lg bg-cyber-card hover:bg-cyber-deep border border-cyber-card flex items-center justify-center text-cyber-muted hover:text-cyber-white transition-colors"
+          className="w-7 h-7 rounded-lg bg-[#0B0A10] hover:bg-[#030305] border border-purple-500/15 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
       {/* Assistant Domain Switcher Dropdown */}
-      <div className="px-4 py-2.5 bg-cyber-navy/60 border-b border-cyber-card flex items-center justify-between text-xs">
-        <span className="text-cyber-muted font-mono text-[11px]">Domain Specialist:</span>
+      <div className="px-4 py-2.5 bg-[#080714]/80 border-b border-purple-500/15 flex items-center justify-between text-xs">
+        <span className="text-zinc-400 font-mono text-[11px]">Domain Specialist:</span>
         <select
           value={selectedDomain}
           onChange={(e) => {
@@ -145,10 +141,10 @@ export default function AIAssistantDrawer({
               }
             ]);
           }}
-          className="bg-cyber-card border border-cyber-card rounded-md text-cyber-white text-[11px] px-2 py-1 focus:outline-none focus:border-cyber-cyan font-mono"
+          className="bg-[#0B0A10] border border-purple-500/25 rounded-md text-white text-[11px] px-2 py-1 focus:outline-none focus:border-purple-500 font-mono"
         >
           {ASSISTANT_OPTIONS.map(opt => (
-            <option key={opt.id} value={opt.id} className="bg-cyber-navy text-cyber-white">
+            <option key={opt.id} value={opt.id} className="bg-[#080714] text-white">
               {opt.name}
             </option>
           ))}
@@ -157,9 +153,9 @@ export default function AIAssistantDrawer({
 
       {/* Active Indicator Scope Banner */}
       {activeIndicator && (
-        <div className="px-4 py-1.5 bg-cyber-card/60 border-b border-cyber-card text-[11px] font-mono text-cyber-cyan flex items-center justify-between">
-          <span>In Scope: <strong className="text-cyber-white">{activeIndicator}</strong></span>
-          <span className="text-[10px] text-cyber-turquoise">Loaded in Context</span>
+        <div className="px-4 py-1.5 bg-[#0B0A10] border-b border-purple-500/15 text-[11px] font-mono text-purple-300 flex items-center justify-between">
+          <span>In Scope: <strong className="text-white">{activeIndicator}</strong></span>
+          <span className="text-[10px] text-violet-300">Loaded in Context</span>
         </div>
       )}
 
@@ -170,16 +166,16 @@ export default function AIAssistantDrawer({
             key={idx}
             className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
           >
-            <div className="flex items-center gap-1.5 mb-1 text-[10px] font-mono text-cyber-muted">
+            <div className="flex items-center gap-1.5 mb-1 text-[10px] font-mono text-zinc-400">
               {msg.role === 'user' ? (
                 <>
                   <span>Security Analyst</span>
-                  <User className="w-3 h-3 text-cyber-gold" />
+                  <User className="w-3 h-3 text-purple-400" />
                 </>
               ) : (
                 <>
-                  <Bot className="w-3 h-3 text-cyber-cyan" />
-                  <span className="text-cyber-cyan">ThreatGuard AI</span>
+                  <Bot className="w-3 h-3 text-purple-400" />
+                  <span className="text-purple-300">ThreatGuard AI</span>
                 </>
               )}
             </div>
@@ -187,18 +183,18 @@ export default function AIAssistantDrawer({
             <div
               className={`p-3.5 rounded-xl max-w-[90%] leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-cyber-card border border-cyber-card text-cyber-white'
-                  : 'bg-cyber-navy/80 border border-cyber-card/80 text-cyber-white/95 shadow-lg'
+                  ? 'bg-[#0B0A10] border border-purple-500/15 text-white'
+                  : 'bg-[#080714]/90 border border-purple-500/25 text-white/95 shadow-lg'
               }`}
             >
               <div className="whitespace-pre-wrap">{msg.text}</div>
 
               {msg.tools && msg.tools.length > 0 && (
-                <div className="mt-3 pt-2 border-t border-cyber-card/60 flex flex-wrap gap-1.5">
+                <div className="mt-3 pt-2 border-t border-purple-500/15 flex flex-wrap gap-1.5">
                   {msg.tools.map((t, i) => (
                     <span
                       key={i}
-                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyber-deep border border-cyber-card text-[10px] font-mono text-cyber-turquoise"
+                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#030305] border border-purple-500/15 text-[10px] font-mono text-purple-300"
                     >
                       <Terminal className="w-2.5 h-2.5" />
                       <span>{t}</span>
@@ -211,8 +207,8 @@ export default function AIAssistantDrawer({
         ))}
 
         {isLoading && (
-          <div className="flex items-center space-x-2 text-cyber-cyan font-mono text-xs p-3 rounded-lg bg-cyber-navy/50 border border-cyber-card">
-            <span className="w-2 h-2 rounded-full bg-cyber-cyan animate-ping"></span>
+          <div className="flex items-center space-x-2 text-purple-300 font-mono text-xs p-3 rounded-lg bg-[#080714]/60 border border-purple-500/15">
+            <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
             <span>Querying MCP tools & correlating threat graph...</span>
           </div>
         )}
@@ -221,14 +217,14 @@ export default function AIAssistantDrawer({
       </div>
 
       {/* Suggested Quick Prompts */}
-      <div className="p-3 bg-cyber-deep/70 border-t border-cyber-card">
-        <div className="text-[10px] font-mono text-cyber-muted mb-1.5 uppercase">Suggested Queries:</div>
+      <div className="p-3 bg-[#030305]/80 border-t border-purple-500/15">
+        <div className="text-[10px] font-mono text-zinc-400 mb-1.5 uppercase">Suggested Queries:</div>
         <div className="flex flex-wrap gap-1.5">
           {suggestedActions.map((action, i) => (
             <button
               key={i}
               onClick={() => handleSendMessage(action)}
-              className="text-[11px] bg-cyber-card hover:bg-cyber-card/80 text-cyber-white/80 hover:text-cyber-cyan border border-cyber-card px-2 py-1 rounded-md transition-colors font-mono"
+              className="text-[11px] bg-[#0B0A10] hover:bg-[#030305] text-zinc-300 hover:text-purple-300 border border-purple-500/15 px-2 py-1 rounded-md transition-colors font-mono"
             >
               {action}
             </button>
@@ -237,7 +233,7 @@ export default function AIAssistantDrawer({
       </div>
 
       {/* Chat Input Bar */}
-      <div className="p-4 bg-cyber-deep border-t border-cyber-card">
+      <div className="p-4 bg-[#030305] border-t border-purple-500/15">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -250,12 +246,12 @@ export default function AIAssistantDrawer({
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder={`Ask ${currentAssistant.name}...`}
-            className="flex-1 bg-cyber-card border border-cyber-card rounded-lg px-3.5 py-2 text-xs text-cyber-white placeholder-cyber-muted focus:outline-none focus:border-cyber-cyan font-mono"
+            className="flex-1 bg-[#0B0A10] border border-purple-500/15 rounded-lg px-3.5 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/50 font-mono"
           />
           <button
             type="submit"
             disabled={isLoading || !inputMessage.trim()}
-            className="w-9 h-9 rounded-lg bg-cyber-cyan/20 hover:bg-cyber-cyan/30 disabled:opacity-40 text-cyber-cyan border border-cyber-cyan/40 flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-lg bg-purple-950/60 hover:bg-purple-900/60 disabled:opacity-40 text-purple-200 border border-purple-500/30 flex items-center justify-center transition-colors shadow-[0_0_12px_rgba(147,51,234,0.2)]"
           >
             <Send className="w-4 h-4" />
           </button>

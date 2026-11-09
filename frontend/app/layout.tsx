@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
+import React, { Suspense } from 'react';
 import './globals.css';
 import AppShell from '@/components/layout/AppShell';
+import { LanguageProvider } from '@/context/LanguageContext';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'ThreatGuard AI - Autonomous AI Cybersecurity & Threat Intelligence Platform',
@@ -13,9 +16,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="antialiased selection:bg-cyber-cyan/30 selection:text-cyber-cyan">
-        <AppShell>{children}</AppShell>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className="antialiased selection:bg-purple-500/30 selection:text-purple-300 bg-[#030305] text-white" suppressHydrationWarning>
+        <ErrorBoundary name="RootApp">
+          <LanguageProvider>
+            {/* Suspense required: AppShell uses usePathname/useRouter hooks */}
+            <Suspense fallback={
+              <div className="min-h-screen bg-[#030305] flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-purple-600/40 border-t-purple-400 rounded-full animate-spin" />
+              </div>
+            }>
+              <AppShell>{children}</AppShell>
+            </Suspense>
+          </LanguageProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

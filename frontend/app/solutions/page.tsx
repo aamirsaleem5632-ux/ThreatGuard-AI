@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -37,10 +37,10 @@ export default function SolutionsPage() {
   return (
     <div className="space-y-12 py-12 px-6 lg:px-12 max-w-7xl mx-auto">
       <div className="space-y-3 max-w-3xl">
-        <h1 className="text-3xl sm:text-5xl font-extrabold text-cyber-white tracking-tight">
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
           Twelve Specialized Cybersecurity Domains
         </h1>
-        <p className="text-sm text-cyber-muted font-mono leading-relaxed">
+        <p className="text-sm text-zinc-400 font-mono leading-relaxed">
           Explore each independent cybersecurity domain. Every module features its own dedicated dashboard, specialized AI assistant, active findings table, and task tracker.
         </p>
       </div>
@@ -51,18 +51,18 @@ export default function SolutionsPage() {
           return (
             <div
               key={sol.id}
-              className="p-6 rounded-2xl bg-cyber-card border border-cyber-card hover:border-cyber-cyan/40 transition-all flex flex-col justify-between space-y-4"
+              className="p-6 rounded-2xl bg-[#0B0A10] border border-purple-500/15 hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(201,168,68,0.2)] transition-all flex flex-col justify-between space-y-4"
             >
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-cyber-deep border border-cyber-card flex items-center justify-center text-cyber-cyan">
+                <div className="w-10 h-10 rounded-xl bg-[#030305] border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_12px_rgba(201,168,68,0.2)]">
                   <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-bold text-cyber-white">{sol.title}</h3>
-                <p className="text-xs text-cyber-muted leading-relaxed font-sans">{sol.role}</p>
+                <h3 className="text-base font-bold text-white">{sol.title}</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed font-sans">{sol.role}</p>
               </div>
 
-              <div className="pt-3 border-t border-cyber-deep flex items-center justify-between text-xs font-mono text-cyber-cyan">
-                <Link href={`/${sol.id}`} className="hover:underline flex items-center gap-1.5">
+              <div className="pt-3 border-t border-purple-500/15 flex items-center justify-between text-xs font-mono text-purple-300">
+                <Link href={`/${sol.id}`} className="hover:text-purple-200 flex items-center gap-1.5 transition-colors">
                   <span>Enter Module Workspace</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>

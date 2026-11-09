@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion } from 'motion/react';
+import CyberGlobe from '@/components/dashboard/CyberGlobe';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -38,6 +40,19 @@ export default function CommandCenterPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRailOpen, setIsRailOpen] = useState(false);
+
+  useEffect(() => {
+    const handleRadarRailToggle = (event: Event) => {
+      const { open } = (event as CustomEvent<{ open?: boolean }>).detail ?? {};
+      if (typeof open === 'boolean') {
+        setIsRailOpen(open);
+      }
+    };
+
+    window.addEventListener('threatguard:toggle-radar-rail', handleRadarRailToggle);
+    return () => window.removeEventListener('threatguard:toggle-radar-rail', handleRadarRailToggle);
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -66,7 +81,13 @@ export default function CommandCenterPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Banner / Headline */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-2xl bg-cyber-card border border-cyber-card shadow-lg">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        whileHover={{ scale: 1.005 }}
+        className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-2xl bg-cyber-card border border-cyber-card shadow-lg"
+      >
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-cyber-turquoise animate-pulse"></span>
@@ -94,11 +115,24 @@ export default function CommandCenterPage() {
             OPTIMAL
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Top Stats Overview Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <div className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: { transition: { staggerChildren: 0.06 } }
+        }}
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5"
+      >
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+          whileHover={{ scale: 1.025, y: -2 }}
+          transition={{ duration: 0.2 }}
+          className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between"
+        >
           <div className="flex items-center justify-between text-cyber-muted text-xs font-mono">
             <span>Active Alerts</span>
             <Activity className="w-3.5 h-3.5 text-cyber-cyan" />
@@ -109,9 +143,14 @@ export default function CommandCenterPage() {
           <div className="text-[10px] font-mono text-cyber-critical mt-1 flex items-center gap-1">
             <span>{overview?.critical_alerts || 4} Critical P1</span>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between">
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+          whileHover={{ scale: 1.025, y: -2 }}
+          transition={{ duration: 0.2 }}
+          className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between"
+        >
           <div className="flex items-center justify-between text-cyber-muted text-xs font-mono">
             <span>Open Incidents</span>
             <AlertTriangle className="w-3.5 h-3.5 text-cyber-critical" />
@@ -122,9 +161,14 @@ export default function CommandCenterPage() {
           <div className="text-[10px] font-mono text-cyber-gold mt-1">
             2 Assigned to AI Orchestrator
           </div>
-        </div>
+        </motion.div>
 
-        <div className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between">
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+          whileHover={{ scale: 1.025, y: -2 }}
+          transition={{ duration: 0.2 }}
+          className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between"
+        >
           <div className="flex items-center justify-between text-cyber-muted text-xs font-mono">
             <span>Investigations</span>
             <Zap className="w-3.5 h-3.5 text-cyber-gold" />
@@ -135,9 +179,14 @@ export default function CommandCenterPage() {
           <div className="text-[10px] font-mono text-cyber-turquoise mt-1">
             1 Waiting Human Approval
           </div>
-        </div>
+        </motion.div>
 
-        <div className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between">
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+          whileHover={{ scale: 1.025, y: -2 }}
+          transition={{ duration: 0.2 }}
+          className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between"
+        >
           <div className="flex items-center justify-between text-cyber-muted text-xs font-mono">
             <span>MTTD (Detect)</span>
             <Clock className="w-3.5 h-3.5 text-cyber-turquoise" />
@@ -148,9 +197,14 @@ export default function CommandCenterPage() {
           <div className="text-[10px] font-mono text-cyber-success mt-1">
             -35% vs Industry Avg
           </div>
-        </div>
+        </motion.div>
 
-        <div className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between">
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+          whileHover={{ scale: 1.025, y: -2 }}
+          transition={{ duration: 0.2 }}
+          className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between"
+        >
           <div className="flex items-center justify-between text-cyber-muted text-xs font-mono">
             <span>MTTR (Respond)</span>
             <TrendingUp className="w-3.5 h-3.5 text-cyber-turquoise" />
@@ -161,9 +215,14 @@ export default function CommandCenterPage() {
           <div className="text-[10px] font-mono text-cyber-success mt-1">
             Autopilot Playbooks
           </div>
-        </div>
+        </motion.div>
 
-        <div className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between">
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+          whileHover={{ scale: 1.025, y: -2 }}
+          transition={{ duration: 0.2 }}
+          className="p-4 rounded-xl bg-cyber-card border border-cyber-card flex flex-col justify-between"
+        >
           <div className="flex items-center justify-between text-cyber-muted text-xs font-mono">
             <span>Domains Monitored</span>
             <ShieldCheck className="w-3.5 h-3.5 text-cyber-cyan" />
@@ -174,11 +233,19 @@ export default function CommandCenterPage() {
           <div className="text-[10px] font-mono text-cyber-turquoise mt-1">
             100% Sensor Uptime
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
+
+      <CyberGlobe isRailOpen={isRailOpen} />
 
       {/* 12 Cybersecurity Domains Posture Matrix */}
-      <div className="p-6 rounded-2xl bg-cyber-card border border-cyber-card space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        whileHover={{ scale: 1.003 }}
+        className="p-6 rounded-2xl bg-cyber-card border border-cyber-card space-y-4"
+      >
         <div className="flex items-center justify-between border-b border-cyber-deep pb-3">
           <div>
             <h2 className="text-sm font-bold text-cyber-white uppercase tracking-wider font-mono">
@@ -228,12 +295,17 @@ export default function CommandCenterPage() {
             </Link>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* MITRE ATT&CK Matrix & Live Incident Correlator */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Active Incident Queue (2 Cols) */}
-        <div className="lg:col-span-2 p-6 rounded-2xl bg-cyber-card border border-cyber-card space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="lg:col-span-2 p-6 rounded-2xl bg-cyber-card border border-cyber-card space-y-4"
+        >
           <div className="flex items-center justify-between border-b border-cyber-deep pb-3">
             <div className="flex items-center gap-2">
               <Crosshair className="w-4 h-4 text-cyber-cyan" />
@@ -311,10 +383,15 @@ export default function CommandCenterPage() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Live Multi-Agent Orchestrator Feed (1 Col) */}
-        <div className="p-6 rounded-2xl bg-cyber-card border border-cyber-card space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="p-6 rounded-2xl bg-cyber-card border border-cyber-card space-y-4"
+        >
           <div className="flex items-center justify-between border-b border-cyber-deep pb-3">
             <div className="flex items-center gap-2">
               <Bot className="w-4 h-4 text-cyber-gold" />
@@ -378,7 +455,7 @@ export default function CommandCenterPage() {
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
