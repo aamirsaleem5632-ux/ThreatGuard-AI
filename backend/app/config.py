@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api"
     
     # Database
-DATABASE_URL: str = "sqlite:///./threatguard.db"
+    DATABASE_URL: str = "sqlite:///./threatguard.db"
     
     # Security & Tokens
     SECRET_KEY: str = os.getenv("SECRET_KEY", "threatguard-super-secret-key-enterprise-soc-2026")
