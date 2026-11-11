@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/layout/LanguageSelector';
 import {
   Search,
+  Menu,
   Bell,
   Building2,
   ShieldCheck,
@@ -15,16 +16,18 @@ import {
 } from 'lucide-react';
 
 interface HeaderProps {
+  onToggleSidebar?: () => void;
   onOpenQuickInvestigate?: () => void;
   onToggleAssistant?: () => void;
 }
 
-export default function Header({ onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
+export default function Header({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
   return (
     <Suspense fallback={
-      <header className="h-16 bg-[#030305]/90 border-b border-purple-500/15 ml-72" />
+      <header className="h-16 bg-[#030305]/90 border-b border-purple-500/15 lg:ml-72" />
     }>
       <HeaderInner
+        onToggleSidebar={onToggleSidebar}
         onOpenQuickInvestigate={onOpenQuickInvestigate}
         onToggleAssistant={onToggleAssistant}
       />
@@ -32,7 +35,7 @@ export default function Header({ onOpenQuickInvestigate, onToggleAssistant }: He
   );
 }
 
-function HeaderInner({ onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
+function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
   const router = useRouter();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,9 +50,10 @@ function HeaderInner({ onOpenQuickInvestigate, onToggleAssistant }: HeaderProps)
   };
 
   return (
-    <header className="h-16 bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between px-6 sticky top-0 z-30 ml-72 select-none">
+    <header className="min-h-16 bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between gap-3 px-3 sm:px-6 sticky top-0 z-30 lg:ml-72 select-none">
       {/* Left side: SOC Quick Filters & Search */}
-      <div className="flex items-center space-x-3 flex-1 max-w-2xl">
+      <div className="flex items-center gap-3 flex-1 min-w-0 max-w-2xl">
+        <button type="button" onClick={onToggleSidebar} aria-label="Open navigation menu" className="lg:hidden shrink-0 rounded-lg border border-purple-500/20 bg-[#0B0A10] p-2 text-purple-300 hover:bg-[#0F0E18]"><Menu className="w-5 h-5" /></button>
         {/* SOC Filter Chips */}
         <div className="hidden 2xl:flex items-center space-x-2 text-[11px] font-mono">
           <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#0B0A10] border border-purple-500/15 text-zinc-400 hover:text-white transition-colors cursor-pointer">
@@ -87,7 +91,7 @@ function HeaderInner({ onOpenQuickInvestigate, onToggleAssistant }: HeaderProps)
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center space-x-3.5 pl-4">
+      <div className="flex items-center gap-2 sm:gap-3.5 pl-1 sm:pl-4 shrink-0">
         {/* Organization Tier Badge */}
         <div className="hidden lg:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/15 px-3 py-1.5 rounded-lg text-xs">
           <Building2 className="w-3.5 h-3.5 text-purple-400" />
@@ -164,7 +168,7 @@ function HeaderInner({ onOpenQuickInvestigate, onToggleAssistant }: HeaderProps)
         </div>
 
         {/* TOP-RIGHT LANGUAGE SELECTOR WIDGET */}
-        <LanguageSelector />
+        <div className="hidden sm:block"><LanguageSelector /></div>
 
         {/* User Profile */}
         <div className="flex items-center space-x-2 pl-2 border-l border-purple-500/15">
