@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Suspense } from 'react';
+import { X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
@@ -42,27 +43,30 @@ const domainLinks = [
   { href: '/governance', label: 'GRC & Incident Resp', icon: FileCheck2, badge: 'NIST' },
 ];
 
-export default function Sidebar() {
+interface SidebarProps { isOpen?: boolean; onClose?: () => void; }
+
+export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   return (
     <Suspense fallback={
       <aside className="w-72 bg-[#080714]/95 border-r border-purple-500/15 backdrop-blur-xl h-screen fixed left-0 top-0 z-40" />
     }>
-      <SidebarInner />
+      <SidebarInner isOpen={isOpen} onClose={onClose} />
     </Suspense>
   );
 }
 
-function SidebarInner() {
+function SidebarInner({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
 
   const isActive = (href: string) => pathname === href;
 
   return (
-    <aside className="w-72 bg-[#080714]/95 border-r border-purple-500/15 backdrop-blur-xl flex flex-col h-screen fixed left-0 top-0 z-40 select-none">
+    <aside className={`w-72 max-w-[85vw] bg-[#080714]/95 border-r border-purple-500/15 backdrop-blur-xl flex flex-col h-screen fixed left-0 top-0 z-50 select-none transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
       {/* Brand Logo with Obsidian Purple Glow */}
       <div className="p-4 border-b border-purple-500/15 flex items-center justify-between">
-        <Link href="/command-center" className="flex items-center space-x-3 group">
+        <Link href="/command-center"
+            onClick={onClose} className="flex items-center space-x-3 group">
           <div className="w-10 h-10 rounded-xl bg-[#030305] border border-purple-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(147,51,234,0.25)] group-hover:border-purple-500/50 transition-colors">
             <ShieldAlert className="w-6 h-6 text-purple-400" />
           </div>
@@ -76,6 +80,7 @@ function SidebarInner() {
             </p>
           </div>
         </Link>
+        <button type="button" onClick={onClose} aria-label="Close navigation menu" className="lg:hidden rounded-lg p-2 text-zinc-400 hover:bg-[#0B0A10] hover:text-white"><X className="w-5 h-5" /></button>
       </div>
 
       {/* Navigation Groups */}
@@ -116,6 +121,7 @@ function SidebarInner() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={onClose}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                     active
                       ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold shadow-[0_0_12px_rgba(147,51,234,0.15)]'
@@ -147,6 +153,7 @@ function SidebarInner() {
           <div className="space-y-1">
             <Link
               href="/investigations"
+            onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/investigations')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.2)] font-bold'
@@ -162,6 +169,7 @@ function SidebarInner() {
 
             <Link
               href="/agents"
+            onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/agents')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
@@ -177,6 +185,7 @@ function SidebarInner() {
 
             <Link
               href="/graph"
+            onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/graph')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
@@ -199,6 +208,7 @@ function SidebarInner() {
           <div className="space-y-1">
             <Link
               href="/reports"
+            onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/reports')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
@@ -213,6 +223,7 @@ function SidebarInner() {
 
             <Link
               href="/settings"
+            onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/settings')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
@@ -249,6 +260,7 @@ function SidebarInner() {
 
         <Link
           href="/"
+            onClick={onClose}
           className="relative z-10 flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-400 hover:text-purple-300 hover:bg-[#0B0A10] transition-none font-mono"
         >
           <span className="flex items-center gap-2">
