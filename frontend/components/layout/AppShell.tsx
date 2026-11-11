@@ -47,6 +47,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isQuickInvestigateOpen, setIsQuickInvestigateOpen] = useState(false);
   const [showIntelRail, setShowIntelRail] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const isMarketing = MARKETING_ROUTES.includes(pathname);
 
@@ -159,16 +160,25 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   // Authenticated SOC Dashboard Experience with Graphical Sidebar Support
   return (
     <div className="min-h-screen bg-[#030305] text-white flex">
-      <Sidebar />
+      {isSidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close navigation menu"
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+        />
+      )}
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0">
         <Header
+          onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
           onOpenQuickInvestigate={() => setIsQuickInvestigateOpen(true)}
           onToggleAssistant={() => setIsAssistantOpen((prev) => !prev)}
         />
 
         <div className="flex-1 flex min-w-0">
-          <main className="flex-1 p-6 ml-72 overflow-x-hidden min-w-0">
+          <main className="flex-1 min-w-0 p-4 sm:p-6 lg:ml-72 overflow-x-hidden">
             <ErrorBoundary name="DashboardContent">
               <Suspense fallback={
                 <div className="min-h-[50vh] flex items-center justify-center font-mono text-zinc-400">
