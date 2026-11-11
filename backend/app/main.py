@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -17,10 +18,16 @@ from app.api.reports import router as reports_router
 from app.api.graph import router as graph_router
 from app.api.modules import router as modules_router
 
+logger = logging.getLogger(__name__)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Seed database with enterprise data
-    seed_database()
+    # Startup: initialise schema and seed enterprise data.
+    # Wrapped so a seed failure logs clearly but never crashes the whole app.
+    try:
+        seed_database()
+    except Exception as exc:
+        logger.error("startup seed_database() failed — app will start without seed data: %s", exc, exc_info=True)
     yield
     # Shutdown logic if needed
 

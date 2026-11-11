@@ -21,8 +21,9 @@ elif database_url.startswith("postgresql://"):
 connect_args = {}
 if database_url.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
-else:
-    connect_args = {"sslmode": "require"}
+# psycopg3 (postgresql+psycopg://) does NOT accept sslmode in connect_args.
+# SSL must be embedded in the DSN as a query param (?sslmode=require).
+# Railway's DATABASE_URL already includes SSL params, so no connect_args needed.
 
 engine = create_engine(
     database_url,
