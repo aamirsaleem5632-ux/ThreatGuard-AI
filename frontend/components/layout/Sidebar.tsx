@@ -1,11 +1,11 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import { X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import {
+  X,
   ShieldAlert,
   LayoutDashboard,
   Radio,
@@ -93,6 +93,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
           </div>
           <Link
             href="/command-center"
+            onClick={onClose}
             className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-none ${
               isActive('/command-center')
                 ? 'bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent text-purple-200 border border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.2)] font-bold'
@@ -153,7 +154,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
           <div className="space-y-1">
             <Link
               href="/investigations"
-            onClick={onClose}
+              onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/investigations')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.2)] font-bold'
@@ -169,7 +170,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
 
             <Link
               href="/agents"
-            onClick={onClose}
+              onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/agents')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
@@ -185,7 +186,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
 
             <Link
               href="/graph"
-            onClick={onClose}
+              onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/graph')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
@@ -208,7 +209,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
           <div className="space-y-1">
             <Link
               href="/reports"
-            onClick={onClose}
+              onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/reports')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
@@ -223,7 +224,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
 
             <Link
               href="/settings"
-            onClick={onClose}
+              onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isActive('/settings')
                   ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
@@ -260,7 +261,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
 
         <Link
           href="/"
-            onClick={onClose}
+          onClick={onClose}
           className="relative z-10 flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-400 hover:text-purple-300 hover:bg-[#0B0A10] transition-none font-mono"
         >
           <span className="flex items-center gap-2">
