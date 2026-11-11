@@ -21,7 +21,7 @@ interface HeaderProps {
   onToggleAssistant?: () => void;
 }
 
-export default function Header({ onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
+export default function Header({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
   return (
     <Suspense fallback={
       <header className="h-16 bg-[#030305]/90 border-b border-purple-500/15 lg:ml-72" />
