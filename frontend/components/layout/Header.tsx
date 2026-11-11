@@ -70,7 +70,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
         </div>
 
         {/* Search Input Bar */}
-        <form onSubmit={handleSearchSubmit} className="flex-1">
+        <form onSubmit={handleSearchSubmit} className="flex-1 min-w-0">
           <div className="relative">
             <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -78,11 +78,11 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('header.searchPlaceholder', 'Search indicator (IP, Domain, Hash), CVE-2024-..., or alert ID...')}
-              className="w-full bg-[#0B0A10] border border-purple-500/15 rounded-lg pl-10 pr-24 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/40 font-mono transition-all"
+              className="w-full min-w-0 bg-[#0B0A10] border border-purple-500/15 rounded-lg pl-10 pr-3 sm:pr-24 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/40 font-mono transition-all"
             />
             <button
               type="submit"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-purple-950/60 hover:bg-purple-900/60 text-purple-200 border border-purple-500/30 px-2 py-0.5 rounded text-[11px] font-mono transition-colors"
+              className="hidden sm:block absolute right-1.5 top-1/2 -translate-y-1/2 bg-purple-950/60 hover:bg-purple-900/60 text-purple-200 border border-purple-500/30 px-2 py-0.5 rounded text-[11px] font-mono transition-colors"
             >
               {t('header.investigate', 'Investigate')}
             </button>
@@ -102,7 +102,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
         </div>
 
         {/* Posture Score Pill */}
-        <div className="flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/20 px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(147,51,234,0.15)]">
+        <div className="hidden sm:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/20 px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(147,51,234,0.15)]">
           <ShieldCheck className="w-4 h-4 text-purple-400" />
           <span className="text-zinc-400 hidden sm:inline">{t('header.posture', 'Posture')}:</span>
           <span className="text-white font-mono font-bold">78.5%</span>
