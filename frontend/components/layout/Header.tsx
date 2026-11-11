@@ -35,7 +35,7 @@ export default function Header({ onOpenQuickInvestigate, onToggleAssistant }: He
   );
 }
 
-function HeaderInner({ onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
+function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
   const router = useRouter();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
