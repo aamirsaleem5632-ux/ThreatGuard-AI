@@ -10,12 +10,16 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 @router.post("/login", response_model=Token)
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()
-    if not user or not verify_password(payload.password, user.hashed_password):
+    if not user or not verify_password(payload.password, user.hashed_password) or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password"
         )
-    
+    # Upgrade legacy deterministic hashes after a successful login.
+    if not user.hashed_password.startswith("pbkdf2_sha256$"):
+        user.hashed_password = hash_password(payload.password)
+        db.commit()
+
     access_token = create_access_token(data={"sub": user.id, "email": user.email, "role": user.role})
     return {
         "access_token": access_token,
