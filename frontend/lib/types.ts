@@ -114,3 +114,26 @@ export interface DomainAssistant {
   name: string;
   specialty: string;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  full_name: string;
+  role: string;
+  org_id: string;
+  organization_name?: string;
+  account_status?: string;
+  created_at?: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user: User;
+}
+
+export interface MessageResponse {
+  message: string;
+  detail?: string;
+  reset_token?: string;
+}

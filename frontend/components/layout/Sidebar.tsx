@@ -25,8 +25,10 @@ import {
   FileText,
   Settings,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 const domainLinks = [
   { href: '/threat-intelligence', label: 'Threat Intelligence', icon: Radio, badge: 'CTI' },
@@ -58,6 +60,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 function SidebarInner({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const { logout } = useAuth();
 
   const isActive = (href: string) => pathname === href;
 
@@ -259,17 +262,33 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
           </svg>
         </div>
 
-        <Link
-          href="/"
-          onClick={onClose}
-          className="relative z-10 flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-400 hover:text-purple-300 hover:bg-[#0B0A10] transition-none font-mono"
-        >
-          <span className="flex items-center gap-2">
-            <ExternalLink className="w-3.5 h-3.5 text-purple-400" />
-            <span>{t('nav.publicPortal', 'Public Portal')}</span>
-          </span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </Link>
+        <div className="relative z-10 flex flex-col gap-1">
+          <Link
+            href="/"
+            onClick={onClose}
+            className="flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-400 hover:text-purple-300 hover:bg-[#0B0A10] transition-none font-mono"
+          >
+            <span className="flex items-center gap-2">
+              <ExternalLink className="w-3.5 h-3.5 text-purple-400" />
+              <span>{t('nav.publicPortal', 'Public Portal')}</span>
+            </span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
+
+          <button
+            type="button"
+            onClick={async () => {
+              if (onClose) onClose();
+              await logout();
+            }}
+            className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 transition-none font-mono"
+          >
+            <span className="flex items-center gap-2">
+              <LogOut className="w-3.5 h-3.5 text-rose-400" />
+              <span>Sign Out</span>
+            </span>
+          </button>
+        </div>
       </div>
     </aside>
   );

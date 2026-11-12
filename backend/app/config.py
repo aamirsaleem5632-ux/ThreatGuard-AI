@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     ABUSEIPDB_API_KEY: str = os.getenv("ABUSEIPDB_API_KEY", "")
     URLHAUS_API_KEY: str = os.getenv("URLHAUS_API_KEY", "")
     
+    # Email Delivery (SMTP - optional; platform generates and logs recovery tokens in dev/airgap mode if unset)
+    SMTP_HOST: str = os.getenv("SMTP_HOST", "")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USER: str = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
+    EMAILS_FROM: str = os.getenv("EMAILS_FROM", "noreply@threatguard.ai")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    
     # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",

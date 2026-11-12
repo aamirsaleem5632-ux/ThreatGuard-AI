@@ -5,18 +5,33 @@ from datetime import datetime
 # Auth Schemas
 class Token(BaseModel):
     access_token: str
-    token_type: str
+    token_type: str = "bearer"
     user: Dict[str, Any]
 
 class LoginRequest(BaseModel):
     email: str
     password: str
+    remember_me: Optional[bool] = False
 
 class RegisterRequest(BaseModel):
+    full_name: str
     email: str
     password: str
-    full_name: str
-    organization_name: str
+    confirm_password: Optional[str] = None
+    organization_name: Optional[str] = None
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+    confirm_password: Optional[str] = None
+
+class MessageResponse(BaseModel):
+    message: str
+    detail: Optional[str] = None
+    reset_token: Optional[str] = None
 
 class UserOut(BaseModel):
     id: str
@@ -24,7 +39,11 @@ class UserOut(BaseModel):
     full_name: str
     role: str
     org_id: str
+    account_status: Optional[str] = "active"
+    organization_name: Optional[str] = None
     created_at: datetime
+    updated_at: Optional[datetime] = None
+
     class Config:
         from_attributes = True
 

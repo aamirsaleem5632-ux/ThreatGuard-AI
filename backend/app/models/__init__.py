@@ -9,7 +9,9 @@ from app.models.all_models import (
     AgentRun,
     ApprovalRequest,
     ModuleProgress,
-    AuditLog
+    AuditLog,
+    PasswordResetToken,
+    UserSession
 )
 
 __all__ = [
@@ -23,5 +25,7 @@ __all__ = [
     "AgentRun",
     "ApprovalRequest",
     "ModuleProgress",
-    "AuditLog"
+    "AuditLog",
+    "PasswordResetToken",
+    "UserSession"
 ]
