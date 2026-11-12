@@ -118,7 +118,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-2 sm:gap-3.5 pl-1 sm:pl-4 shrink-0">
+      <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-3.5 pl-1 sm:pl-4 shrink">
         {/* Organization Tier Badge */}
         <div className="hidden xl:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/15 px-3 py-1.5 rounded-lg text-xs">
           <Building2 className="w-3.5 h-3.5 text-purple-400" />
@@ -203,7 +203,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
             type="button"
             onClick={() => setShowUserMenu(!showUserMenu)}
             aria-label="User account menu"
-            className="flex items-center space-x-2 p-1 rounded-lg hover:bg-[#0B0A10] transition-colors group cursor-pointer"
+            className="flex min-w-0 items-center space-x-2 p-1 rounded-lg hover:bg-[#0B0A10] transition-colors group cursor-pointer"
           >
             <div className="w-8 h-8 rounded-lg bg-[#0B0A10] border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold text-xs font-mono shadow-[0_0_12px_rgba(147,51,234,0.2)] group-hover:border-purple-500/60 transition-colors">
               {initials}
