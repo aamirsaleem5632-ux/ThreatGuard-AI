@@ -14,7 +14,7 @@ from app.models.all_models import (
     ModuleProgress,
     AuditLog
 )
-from app.security.auth import hash_password
+from app.security.auth import hash_password, verify_password
 
 logger = logging.getLogger(__name__)
 
@@ -35,17 +35,50 @@ def seed_database():
     try:
         Base.metadata.create_all(bind=engine)
         logger.info("Schema verified / created successfully.")
+        
+        # Safe backward-compatible column migration for existing databases
+        from sqlalchemy import inspect, text
+        inspector = inspect(engine)
+        if "users" in inspector.get_table_names():
+            user_columns = [col['name'] for col in inspector.get_columns('users')]
+            with engine.connect() as conn:
+                if 'account_status' not in user_columns:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN account_status VARCHAR(50) DEFAULT 'active'"))
+                    conn.commit()
+                if 'updated_at' not in user_columns:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN updated_at DATETIME"))
+                    conn.commit()
     except Exception as exc:
-        # If we can't reach the DB at all, log and bail — the app will still
-        # start so Railway's health-check endpoint can respond.
-        logger.error("create_all failed — cannot reach database: %s", exc, exc_info=True)
-        return
+        logger.error("create_all / column migration notice: %s", exc, exc_info=True)
 
     # --- 2. Seed guard -----------------------------------------------------
     db: Session = SessionLocal()
     try:
-        if db.query(Organization).first():
-            logger.info("Seed data already present — skipping.")
+        existing_org = db.query(Organization).first()
+        if existing_org:
+            logger.info("Seed data already present — verifying admin account.")
+            admin = db.query(User).filter(User.email == "admin@threatguard.ai").first()
+            if admin:
+                if not admin.hashed_password.startswith(("$2b$", "$2a$")) or not verify_password("admin123", admin.hashed_password):
+                    admin.hashed_password = hash_password("admin123")
+                    logger.info("Admin password upgraded to secure bcrypt hash.")
+                admin.is_active = True
+                admin.account_status = "active"
+                admin.role = "Super Administrator"
+                db.commit()
+            else:
+                admin_user = User(
+                    org_id=existing_org.id,
+                    email="admin@threatguard.ai",
+                    full_name="Esha Amir Choudhary",
+                    hashed_password=hash_password("admin123"),
+                    role="Super Administrator",
+                    is_active=True,
+                    account_status="active"
+                )
+                db.add(admin_user)
+                db.commit()
+                logger.info("Admin user created under existing organization.")
             return
 
         logger.info("Seeding initial ThreatGuard AI enterprise dataset...")

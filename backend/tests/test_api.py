@@ -54,6 +54,13 @@ class TestThreatGuardAPI(unittest.TestCase):
     def tearDown(self):
         self.client.close()
 
+    def get_auth_headers(self, email="admin@threatguard.ai", password="admin123"):
+        login_res = self.client.post("/api/auth/login", json={"email": email, "password": password})
+        if login_res.status_code == 200:
+            token = login_res.json()["access_token"]
+            return {"Authorization": f"Bearer {token}"}
+        return {}
+
     def test_root_endpoint(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
@@ -73,7 +80,9 @@ class TestThreatGuardAPI(unittest.TestCase):
         self.assertIn("Malicious", result["verdict"])
 
     def test_mcp_tools_list(self):
-        response = self.client.get("/api/mcp/tools")
+        # Tools list is an open integration registry
+        headers = self.get_auth_headers()
+        response = self.client.get("/api/mcp/tools", headers=headers)
         self.assertEqual(response.status_code, 200)
         tools = response.json()
         self.assertGreaterEqual(len(tools), 12)
@@ -82,21 +91,175 @@ class TestThreatGuardAPI(unittest.TestCase):
         self.assertIn("check_domain_intelligence", tool_names)
         self.assertIn("search_vulnerability", tool_names)
 
-    def test_dashboard_overview(self):
+    def test_unauthenticated_dashboard_rejected(self):
+        # Protected route MUST reject unauthenticated requests
         response = self.client.get("/api/dashboard/overview")
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
-        self.assertIn("posture_score", data)
-        self.assertEqual(data["domains_monitored"], 12)
+        self.assertEqual(response.status_code, 401)
+        self.assertIn("Authentication required", response.json()["detail"])
+
+    def test_login_success_and_authenticated_dashboard(self):
+        login_res = self.client.post(
+            "/api/auth/login",
+            json={"email": "admin@threatguard.ai", "password": "admin123", "remember_me": True}
+        )
+        self.assertEqual(login_res.status_code, 200)
+        data = login_res.json()
+        self.assertIn("access_token", data)
+        self.assertEqual(data["user"]["email"], "admin@threatguard.ai")
+        self.assertIn("access_token", login_res.cookies)
+
+        token = data["access_token"]
+        auth_header = {"Authorization": f"Bearer {token}"}
+
+        # Request dashboard with Bearer token
+        dash_res = self.client.get("/api/dashboard/overview", headers=auth_header)
+        self.assertEqual(dash_res.status_code, 200)
+        dash_data = dash_res.json()
+        self.assertIn("posture_score", dash_data)
+        self.assertEqual(dash_data["domains_monitored"], 12)
+
+    def test_login_incorrect_credentials(self):
+        response = self.client.post(
+            "/api/auth/login",
+            json={"email": "admin@threatguard.ai", "password": "wrongpassword123"}
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertIn("Incorrect email address or password", response.json()["detail"])
+
+    def test_customer_registration_and_isolation(self):
+        # Register new customer
+        customer_email = "newcustomer@enterprise-corp.com"
+        reg_payload = {
+            "full_name": "Cyber Defense Lead",
+            "email": customer_email,
+            "password": "StrongPassword2026!",
+            "confirm_password": "StrongPassword2026!",
+            "organization_name": "Apex Cyber Defense"
+        }
+        reg_res = self.client.post("/api/auth/register", json=reg_payload)
+        self.assertEqual(reg_res.status_code, 201)
+        reg_data = reg_res.json()
+        self.assertIn("access_token", reg_data)
+        self.assertEqual(reg_data["user"]["email"], customer_email)
+        self.assertEqual(reg_data["user"]["organization_name"], "Apex Cyber Defense")
+
+        # Test duplicate registration is rejected
+        dup_res = self.client.post("/api/auth/register", json=reg_payload)
+        self.assertEqual(dup_res.status_code, 400)
+        self.assertIn("already exists", dup_res.json()["detail"])
+
+        # Test customer can view their own /auth/me
+        cust_token = reg_data["access_token"]
+        cust_headers = {"Authorization": f"Bearer {cust_token}"}
+        me_res = self.client.get("/api/auth/me", headers=cust_headers)
+        self.assertEqual(me_res.status_code, 200)
+        me_data = me_res.json()
+        self.assertEqual(me_data["email"], customer_email)
+        self.assertEqual(me_data["organization_name"], "Apex Cyber Defense")
+
+        # Verify customer's dashboard loads their own org data
+        cust_dash = self.client.get("/api/dashboard/overview", headers=cust_headers)
+        self.assertEqual(cust_dash.status_code, 200)
+
+    def test_registration_validation_rules(self):
+        # Password too short
+        short_pwd = {
+            "full_name": "Test Analyst",
+            "email": "testshort@corp.com",
+            "password": "short",
+            "confirm_password": "short"
+        }
+        res = self.client.post("/api/auth/register", json=short_pwd)
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("at least 8 characters", res.json()["detail"])
+
+        # Mismatched passwords
+        mismatch_pwd = {
+            "full_name": "Test Analyst",
+            "email": "mismatch@corp.com",
+            "password": "StrongPassword2026!",
+            "confirm_password": "DifferentPassword2026!"
+        }
+        res2 = self.client.post("/api/auth/register", json=mismatch_pwd)
+        self.assertEqual(res2.status_code, 400)
+        self.assertIn("do not match", res2.json()["detail"])
+
+        # Invalid email format
+        invalid_email = {
+            "full_name": "Test Analyst",
+            "email": "invalid-email-address",
+            "password": "StrongPassword2026!"
+        }
+        res3 = self.client.post("/api/auth/register", json=invalid_email)
+        self.assertEqual(res3.status_code, 400)
+        self.assertIn("valid email", res3.json()["detail"])
+
+    def test_forgot_password_and_reset_flow(self):
+        # 1. Request reset
+        forgot_res = self.client.post(
+            "/api/auth/forgot-password",
+            json={"email": "kahaf@threatguard.ai"}
+        )
+        self.assertEqual(forgot_res.status_code, 200)
+        forgot_data = forgot_res.json()
+        self.assertIn("reset_token", forgot_data)
+        token = forgot_data["reset_token"]
+
+        # 2. Reset password with new password
+        reset_res = self.client.post(
+            "/api/auth/reset-password",
+            json={
+                "token": token,
+                "new_password": "NewSecret2026!",
+                "confirm_password": "NewSecret2026!"
+            }
+        )
+        self.assertEqual(reset_res.status_code, 200)
+        self.assertIn("successfully updated", reset_res.json()["message"])
+
+        # 3. Old password should fail
+        old_login = self.client.post(
+            "/api/auth/login",
+            json={"email": "kahaf@threatguard.ai", "password": "admin123"}
+        )
+        self.assertEqual(old_login.status_code, 401)
+
+        # 4. New password should succeed
+        new_login = self.client.post(
+            "/api/auth/login",
+            json={"email": "kahaf@threatguard.ai", "password": "NewSecret2026!"}
+        )
+        self.assertEqual(new_login.status_code, 200)
+        self.assertIn("access_token", new_login.json())
+
+        # 5. Token reuse should be rejected
+        reuse_res = self.client.post(
+            "/api/auth/reset-password",
+            json={
+                "token": token,
+                "new_password": "AnotherNew2026!",
+                "confirm_password": "AnotherNew2026!"
+            }
+        )
+        self.assertEqual(reuse_res.status_code, 400)
+        self.assertIn("invalid or has already been used", reuse_res.json()["detail"])
+
+    def test_logout(self):
+        headers = self.get_auth_headers()
+        logout_res = self.client.post("/api/auth/logout", headers=headers)
+        self.assertEqual(logout_res.status_code, 200)
+        self.assertIn("logged out", logout_res.json()["message"])
 
     def test_assistants_domains(self):
-        response = self.client.get("/api/assistants/domains")
+        headers = self.get_auth_headers()
+        response = self.client.get("/api/assistants/domains", headers=headers)
         self.assertEqual(response.status_code, 200)
         domains = response.json()
         self.assertEqual(len(domains), 12)
 
     def test_graph_nodes(self):
-        response = self.client.get("/api/graph/nodes")
+        headers = self.get_auth_headers()
+        response = self.client.get("/api/graph/nodes", headers=headers)
         self.assertEqual(response.status_code, 200)
         graph = response.json()
         self.assertGreater(len(graph["nodes"]), 0)
