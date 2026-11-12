@@ -62,7 +62,12 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   const [showIntelRail, setShowIntelRail] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const isMarketing = MARKETING_ROUTES.includes(pathname);
+  const isMarketing = MARKETING_ROUTES.some(
+    (route) =>
+      route === '/'
+        ? pathname === route
+        : pathname === route || pathname.startsWith(`${route}/`)
+  );
   const isAuthPage = AUTH_ROUTES.includes(pathname);
 
   useEffect(() => {
@@ -190,13 +195,13 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
               <>
                 <Link
                   href="/login"
-                  className="px-3.5 py-2 rounded-lg text-xs font-mono text-zinc-300 hover:text-purple-300 transition-colors"
+                  className="px-3.5 py-2 rounded-lg text-xs font-mono text-zinc-300 hover:text-purple-300 transition-colors whitespace-nowrap"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/register"
-                  className="hidden sm:inline-block px-3.5 py-2 rounded-lg text-xs font-mono text-zinc-300 hover:text-purple-300 transition-colors"
+                  className="px-3.5 py-2 rounded-lg text-xs font-mono text-zinc-300 hover:text-purple-300 transition-colors whitespace-nowrap"
                 >
                   Register
                 </Link>
@@ -208,8 +213,8 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
                 href="/command-center"
                 className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 text-xs font-mono font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all"
               >
-                <span>{t('nav.commandCenter', 'Launch SOC Command')}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span className="whitespace-nowrap">{t('nav.commandCenter', 'Launch SOC Command')}</span>
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </Link>
             </motion.div>
 
