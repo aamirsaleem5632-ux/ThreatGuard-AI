@@ -54,6 +54,16 @@ export default function CommandCenterPage() {
     return () => window.removeEventListener('threatguard:toggle-radar-rail', handleRadarRailToggle);
   }, []);
 
+  const handleCommandPrompt = async (query: string) => {
+    try {
+      const result = await api.chatWithAssistant('threat-intelligence', query);
+      window.alert(result.response || 'The assistant returned an empty response.');
+    } catch (error) {
+      console.error('Command Center assistant request failed:', error);
+      window.alert('Unable to get a response from the ThreatGuard backend. Please try again.');
+    }
+  };
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -236,7 +246,7 @@ export default function CommandCenterPage() {
         </motion.div>
       </motion.div>
 
-      <CyberGlobe isRailOpen={isRailOpen} />
+      <CyberGlobe isRailOpen={isRailOpen} onAskCopilot={handleCommandPrompt} />
 
       {/* 12 Cybersecurity Domains Posture Matrix */}
       <motion.div

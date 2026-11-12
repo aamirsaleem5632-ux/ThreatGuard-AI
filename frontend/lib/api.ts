@@ -9,7 +9,7 @@ import {
   DomainAssistant
 } from './types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 async function safeFetch<T>(endpoint: string, fallback: T): Promise<T> {
   try {
@@ -17,9 +17,13 @@ async function safeFetch<T>(endpoint: string, fallback: T): Promise<T> {
       cache: 'no-store',
       headers: { 'Content-Type': 'application/json' }
     });
-    if (!res.ok) return fallback;
+    if (!res.ok) {
+      console.error(`API request failed for ${endpoint} (HTTP ${res.status}); using demo fallback data.`);
+      return fallback;
+    }
     return await res.json();
   } catch (err) {
+    console.error(`API request failed for ${endpoint}; using demo fallback data.`, err);
     return fallback;
   }
 }

@@ -2,8 +2,12 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from starlette.responses import JSONResponse
 
 from app.config import settings
+from app.database import engine
 from app.seed_data import seed_database
 from app.api.auth import router as auth_router
 from app.api.dashboard import router as dashboard_router
@@ -74,4 +78,14 @@ def root():
 
 @app.get("/api/health")
 def health():
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+    except SQLAlchemyError:
+        logger.exception("Database health check failed")
+        return JSONResponse(
+            status_code=503,
+            content={"status": "unhealthy", "service": "ThreatGuard AI Backend API", "database": "unavailable"},
+        )
+
     return {"status": "healthy", "service": "ThreatGuard AI Backend API"}

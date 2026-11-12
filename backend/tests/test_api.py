@@ -1,11 +1,58 @@
 import unittest
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 from app.main import app
+from app.database import Base, get_db
+import app.main as main_module
+import app.seed_data as seed_data
 from app.services.risk_engine import RiskEngine
 
 class TestThreatGuardAPI(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.original_engine = main_module.engine
+        cls.original_seed_engine = seed_data.engine
+        cls.original_seed_session_local = seed_data.SessionLocal
+        cls.test_engine = create_engine(
+            "sqlite://",
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
+        )
+        cls.test_session_local = sessionmaker(
+            autocommit=False,
+            autoflush=False,
+            bind=cls.test_engine,
+        )
+
+        main_module.engine = cls.test_engine
+        seed_data.engine = cls.test_engine
+        seed_data.SessionLocal = cls.test_session_local
+        seed_data.seed_database()
+
+        def override_get_db():
+            db = cls.test_session_local()
+            try:
+                yield db
+            finally:
+                db.close()
+
+        app.dependency_overrides[get_db] = override_get_db
+
+    @classmethod
+    def tearDownClass(cls):
+        app.dependency_overrides.pop(get_db, None)
+        main_module.engine = cls.original_engine
+        seed_data.engine = cls.original_seed_engine
+        seed_data.SessionLocal = cls.original_seed_session_local
+        cls.test_engine.dispose()
+
     def setUp(self):
         self.client = TestClient(app)
+
+    def tearDown(self):
+        self.client.close()
 
     def test_root_endpoint(self):
         response = self.client.get("/")
