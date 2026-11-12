@@ -102,7 +102,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
         </div>
 
         {/* Posture Score Pill */}
-        <div className="hidden xl:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/20 px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(147,51,234,0.15)]">
+        <div className="hidden sm:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/20 px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(147,51,234,0.15)]">
           <ShieldCheck className="w-4 h-4 text-purple-400" />
           <span className="text-zinc-400 hidden sm:inline">{t('header.posture', 'Posture')}:</span>
           <span className="text-white font-mono font-bold">78.5%</span>
