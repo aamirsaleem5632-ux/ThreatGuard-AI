@@ -1,10 +1,10 @@
-import hashlib
+﻿import hashlib
 import hmac
 import base64
 import json
 import time
 from typing import Optional, Dict, Any
-from fastapi import Depends, HTTPException, status
+from fastapi import Request, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.config import settings
@@ -71,24 +71,53 @@ def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
     except Exception:
         return None
 
+def extract_token(request: Request) -> Optional[str]:
+    auth_header = request.headers.get("Authorization", "")
+
+    if auth_header.startswith("Bearer "):
+        return auth_header[7:].strip()
+
+    cookie_token = request.cookies.get("access_token")
+    if cookie_token:
+        return cookie_token.removeprefix("Bearer ").strip()
+
+    return None
+
+
 def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_scheme),
+    request: Request,
     db: Session = Depends(get_db)
 ) -> User:
-    """Dependency that returns current user or falls back to standard demo admin."""
-    if credentials:
-        payload = decode_access_token(credentials.credentials)
-        if payload and "sub" in payload:
-            user = db.query(User).filter(User.id == payload["sub"]).first()
-            if user:
-                return user
-                
-    # Fallback to seeded demo user so dashboard works out-of-the-box
-    default_user = db.query(User).first()
-    if default_user:
-        return default_user
-        
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Authentication credentials not found or invalid"
-    )
+    raw_token = extract_token(request)
+
+    if not raw_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+    payload = decode_access_token(raw_token)
+
+    if not payload or "sub" not in payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+    user = db.query(User).filter(User.id == payload["sub"]).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found"
+        )
+
+    if not user.is_active or getattr(user, "account_status", "active") == "suspended":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is deactivated or suspended."
+        )
+
+    return user
