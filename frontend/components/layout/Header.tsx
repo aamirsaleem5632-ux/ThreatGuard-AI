@@ -77,7 +77,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
   };
 
   return (
-    <header className="min-h-16 bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between gap-3 px-3 sm:px-6 sticky top-0 z-30 lg:ml-72 select-none">
+    <header className="min-h-16 w-full lg:w-auto min-w-0 max-w-full bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between gap-3 px-3 sm:px-6 sticky top-0 z-30 lg:ml-72 select-none">
       {/* Left side: SOC Quick Filters & Search */}
       <div className="flex items-center gap-3 flex-1 min-w-0 max-w-2xl">
         <button type="button" onClick={onToggleSidebar} aria-label="Open navigation menu" className="lg:hidden shrink-0 rounded-lg border border-purple-500/20 bg-[#0B0A10] p-2 text-purple-300 hover:bg-[#0F0E18]"><Menu className="w-5 h-5" /></button>
