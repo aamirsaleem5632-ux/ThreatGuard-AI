@@ -30,7 +30,7 @@ interface HeaderProps {
 export default function Header({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
   return (
     <Suspense fallback={
-      <header className="h-16 bg-[#030305]/90 border-b border-purple-500/15 lg:ml-72" />
+      <header className="h-16 bg-[#030305]/90 border-b border-purple-500/15 lg:ml-72 lg:w-[calc(100%_-_18rem)]" />
     }>
       <HeaderInner
         onToggleSidebar={onToggleSidebar}
@@ -77,7 +77,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
   };
 
   return (
-    <header className="min-h-16 w-full lg:w-auto min-w-0 max-w-full bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between gap-3 px-3 sm:px-6 sticky top-0 z-30 lg:ml-72 select-none">
+    <header className="min-h-16 w-full min-w-0 max-w-full bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between gap-3 px-3 sm:px-6 sticky top-0 z-30 lg:ml-72 lg:w-[calc(100%_-_18rem)] select-none">
       {/* Left side: SOC Quick Filters & Search */}
       <div className="flex items-center gap-3 flex-1 min-w-0 max-w-2xl">
         <button type="button" onClick={onToggleSidebar} aria-label="Open navigation menu" className="lg:hidden shrink-0 rounded-lg border border-purple-500/20 bg-[#0B0A10] p-2 text-purple-300 hover:bg-[#0F0E18]"><Menu className="w-5 h-5" /></button>
@@ -118,7 +118,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
       </div>
 
       {/* Right Controls */}
-      <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-3.5 pl-1 sm:pl-4 shrink">
+      <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-3.5 xl:gap-2 pl-1 sm:pl-4 xl:pl-2 shrink-0">
         {/* Organization Tier Badge */}
         <div className="hidden xl:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/15 px-3 py-1.5 rounded-lg text-xs">
           <Building2 className="w-3.5 h-3.5 text-purple-400" />
@@ -139,7 +139,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
         {/* Run Investigation Action Button */}
         <button
           onClick={onOpenQuickInvestigate}
-          className="hidden xl:flex items-center space-x-1.5 bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all"
+          className="hidden 2xl:flex items-center space-x-1.5 bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all"
         >
           <Zap className="w-3.5 h-3.5 fill-purple-500 text-purple-400" />
           <span>{t('header.newInvestigation', 'New Investigation')}</span>
