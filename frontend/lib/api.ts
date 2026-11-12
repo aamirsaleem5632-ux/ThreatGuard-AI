@@ -6,16 +6,50 @@ import {
   Incident,
   Investigation,
   MCPTool,
-  DomainAssistant
+  DomainAssistant,
+  User,
+  AuthResponse,
+  MessageResponse
 } from './types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
-async function safeFetch<T>(endpoint: string, fallback: T): Promise<T> {
+let memoryToken: string | null = null;
+
+export function setAuthToken(token: string | null) {
+  memoryToken = token;
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('threatguard_auth_token', token);
+    } else {
+      localStorage.removeItem('threatguard_auth_token');
+    }
+  }
+}
+
+export function getAuthToken(): string | null {
+  if (memoryToken) return memoryToken;
+  if (typeof window !== 'undefined') {
+    memoryToken = localStorage.getItem('threatguard_auth_token');
+  }
+  return memoryToken;
+}
+
+async function safeFetch<T>(endpoint: string, fallback: T, init?: RequestInit): Promise<T> {
   try {
+    const token = getAuthToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(init?.headers as Record<string, string> || {})
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const res = await fetch(`${API_BASE}${endpoint}`, {
       cache: 'no-store',
-      headers: { 'Content-Type': 'application/json' }
+      credentials: 'include',
+      ...init,
+      headers
     });
     if (!res.ok) {
       console.error(`API request failed for ${endpoint} (HTTP ${res.status}); using demo fallback data.`);
@@ -26,6 +60,28 @@ async function safeFetch<T>(endpoint: string, fallback: T): Promise<T> {
     console.error(`API request failed for ${endpoint}; using demo fallback data.`, err);
     return fallback;
   }
+}
+
+async function requestApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string> || {})
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    credentials: 'include',
+    ...options,
+    headers
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const errorMsg = data?.detail || data?.message || `Request failed with status ${res.status}`;
+    throw new Error(errorMsg);
+  }
+  return data as T;
 }
 
 export const api = {
@@ -403,6 +459,54 @@ export const api = {
         { title: "Verify patch compliance checklist", status: "Pending", priority: "Medium" }
       ],
       progress: 78.5
+    });
+  },
+
+  // Authentication API Methods
+  async login(payload: { email: string; password: string; remember_me?: boolean }): Promise<AuthResponse> {
+    const res = await requestApi<AuthResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    setAuthToken(res.access_token);
+    return res;
+  },
+
+  async register(payload: { full_name: string; email: string; password: string; confirm_password?: string; organization_name?: string }): Promise<AuthResponse> {
+    const res = await requestApi<AuthResponse>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    setAuthToken(res.access_token);
+    return res;
+  },
+
+  async logout(): Promise<MessageResponse> {
+    try {
+      const res = await requestApi<MessageResponse>('/auth/logout', {
+        method: 'POST'
+      });
+      return res;
+    } finally {
+      setAuthToken(null);
+    }
+  },
+
+  async getCurrentUser(): Promise<User> {
+    return requestApi<User>('/auth/me');
+  },
+
+  async forgotPassword(email: string): Promise<MessageResponse> {
+    return requestApi<MessageResponse>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  },
+
+  async resetPassword(payload: { token: string; new_password: string; confirm_password?: string }): Promise<MessageResponse> {
+    return requestApi<MessageResponse>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(payload)
     });
   }
 };

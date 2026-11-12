@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import Sidebar from '@/components/layout/Sidebar';
@@ -12,11 +12,14 @@ import ThreatIntelSidebar from '@/components/dashboard/ThreatIntelSidebar';
 import LanguageSelector from '@/components/layout/LanguageSelector';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { useLanguage } from '@/context/LanguageContext';
+import { useAuth } from '@/context/AuthContext';
 import {
   ShieldAlert,
   ArrowRight,
   Bot,
-  Radar
+  Radar,
+  LogOut,
+  User as UserIcon
 } from 'lucide-react';
 
 const MARKETING_ROUTES = [
@@ -27,6 +30,14 @@ const MARKETING_ROUTES = [
   '/threat-intel',
   '/architecture',
   '/contact'
+];
+
+const AUTH_ROUTES = [
+  '/login',
+  '/register',
+  '/signup',
+  '/forgot-password',
+  '/reset-password'
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -43,13 +54,31 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
 function AppShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useLanguage();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isQuickInvestigateOpen, setIsQuickInvestigateOpen] = useState(false);
   const [showIntelRail, setShowIntelRail] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const isMarketing = MARKETING_ROUTES.includes(pathname);
+  const isMarketing = MARKETING_ROUTES.some(
+    (route) =>
+      route === '/'
+        ? pathname === route
+        : pathname === route || pathname.startsWith(`${route}/`)
+  );
+  const isAuthPage = AUTH_ROUTES.includes(pathname);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (isAuthPage && isAuthenticated) {
+        router.replace('/command-center');
+      } else if (!isMarketing && !isAuthPage && !isAuthenticated) {
+        router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
+      }
+    }
+  }, [isLoading, isAuthenticated, isAuthPage, isMarketing, pathname, router]);
 
   const handleToggleIntelRail = () => {
     const next = !showIntelRail;
@@ -61,6 +90,48 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
       );
     }
   };
+
+  // Dedicated Authentication Pages Layout
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen bg-[#030305] text-white cyber-grid-pattern flex flex-col justify-between">
+        {/* Auth Navbar */}
+        <header className="h-16 border-b border-purple-500/15 bg-[#030305]/85 backdrop-blur-xl px-6 lg:px-12 flex items-center justify-between sticky top-0 z-50">
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="w-9 h-9 rounded-xl bg-[#080714] border border-purple-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(147,51,234,0.25)] group-hover:border-purple-500/50 transition-colors">
+              <ShieldAlert className="w-5 h-5 text-purple-400" />
+            </div>
+            <div>
+              <span className="font-bold text-base text-white tracking-wider flex items-center gap-1.5 font-sans">
+                THREATGUARD <span className="text-purple-300 text-[10px] font-mono bg-purple-950/60 px-1 py-0.5 rounded border border-purple-500/30">AI</span>
+              </span>
+            </div>
+          </Link>
+          <div className="flex items-center space-x-4">
+            <Link
+              href="/"
+              className="text-xs font-mono text-zinc-400 hover:text-purple-300 transition-colors"
+            >
+              ← Back to Overview
+            </Link>
+            <LanguageSelector />
+          </div>
+        </header>
+
+        {/* Auth Content */}
+        <main className="flex-1 flex items-center justify-center py-10 px-4">
+          <ErrorBoundary name="AuthPageContent">
+            {children}
+          </ErrorBoundary>
+        </main>
+
+        {/* Auth Footer */}
+        <footer className="border-t border-purple-500/15 bg-[#080714]/70 py-4 px-6 text-center text-xs font-mono text-zinc-500">
+          <span>ThreatGuard AI Enterprise Security • Autonomous SOC & Threat Intelligence</span>
+        </footer>
+      </div>
+    );
+  }
 
   if (isMarketing) {
     return (
@@ -103,20 +174,47 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
 
           {/* Action CTAs + Top-Right Language Selector */}
           <div className="flex items-center space-x-3">
-            <Link
-              href="/contact"
-              className="hidden sm:inline-block px-3.5 py-2 rounded-lg text-xs font-mono text-zinc-300 hover:text-purple-300 transition-colors"
-            >
-              {t('nav.contact', 'Request Demo')}
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/command-center"
+                  className="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-purple-300 bg-purple-950/40 border border-purple-500/30 hover:border-purple-500/50 transition-colors"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="max-w-[120px] truncate">{user?.full_name?.split(' ')[0] || 'Dashboard'}</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="hidden md:inline-block px-2.5 py-1.5 rounded-lg text-xs font-mono text-zinc-400 hover:text-rose-400 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="px-3.5 py-2 rounded-lg text-xs font-mono text-zinc-300 hover:text-purple-300 transition-colors whitespace-nowrap"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-3.5 py-2 rounded-lg text-xs font-mono text-zinc-300 hover:text-purple-300 transition-colors whitespace-nowrap"
+                >
+                  Register
+                </Link>
+              </>
+            )}
 
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
                 href="/command-center"
                 className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 text-xs font-mono font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all"
               >
-                <span>{t('nav.commandCenter', 'Launch SOC Command')}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span className="whitespace-nowrap">{t('nav.commandCenter', 'Launch SOC Command')}</span>
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </Link>
             </motion.div>
 
@@ -153,6 +251,21 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </footer>
+      </div>
+    );
+  }
+
+  // Protected SOC Dashboard Route Guard: Show security validation loader while checking session
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#030305] flex flex-col items-center justify-center font-mono text-xs text-zinc-400 gap-3">
+        <div className="w-12 h-12 rounded-xl bg-[#080714] border border-purple-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(147,51,234,0.25)]">
+          <ShieldAlert className="w-6 h-6 text-purple-400 animate-pulse" />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+          <span>Verifying SOC Security Credentials...</span>
+        </div>
       </div>
     );
   }

@@ -38,9 +38,13 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     role = Column(String(50), default="Security Analyst")  # Super Administrator, Security Analyst, etc.
     is_active = Column(Boolean, default=True)
+    account_status = Column(String(50), default="active")  # active, suspended, pending_verification
     created_at = Column(DateTime, default=utc_now)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
 
     organization = relationship("Organization", back_populates="users")
+    sessions = relationship("UserSession", back_populates="user", cascade="all, delete-orphan")
+    password_reset_tokens = relationship("PasswordResetToken", back_populates="user", cascade="all, delete-orphan")
 
 class Asset(Base):
     __tablename__ = "assets"
@@ -188,3 +192,30 @@ class AuditLog(Base):
     timestamp = Column(DateTime, default=utc_now)
 
     organization = relationship("Organization", back_populates="audit_logs")
+
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    token_hash = Column(String(255), unique=True, index=True, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=utc_now)
+
+    user = relationship("User", back_populates="password_reset_tokens")
+
+class UserSession(Base):
+    __tablename__ = "user_sessions"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    session_token = Column(String(255), unique=True, index=True, nullable=False)
+    ip_address = Column(String(80), nullable=True)
+    user_agent = Column(Text, nullable=True)
+    expires_at = Column(DateTime, nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utc_now)
+    last_activity = Column(DateTime, default=utc_now)
+
+    user = relationship("User", back_populates="sessions")
