@@ -12,9 +12,7 @@ import {
   MessageResponse
 } from './types';
 
-const DEFAULT_API_URL = 'https://gleaming-youthfulness-production-87570148.up.railway.app';
-const configuredApiUrl = (process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_URL).trim().replace(/\/+$/, '');
-const API_BASE = `${configuredApiUrl.replace(/\/api$/i, '')}/api`;
+const API_BASE = '/api';
 
 let memoryToken: string | null = null;
 
@@ -81,7 +79,7 @@ async function requestApi<T>(endpoint: string, options: RequestInit = {}): Promi
       headers
     });
   } catch {
-    throw new Error('Authentication service is temporarily unavailable. Please try again in a moment.');
+    throw new Error('Unable to reach the authentication service. Check the Vercel NEXT_PUBLIC_API_URL setting and confirm the backend is available.');
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
