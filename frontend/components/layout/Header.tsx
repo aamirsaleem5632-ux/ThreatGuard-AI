@@ -30,7 +30,7 @@ interface HeaderProps {
 export default function Header({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistant }: HeaderProps) {
   return (
     <Suspense fallback={
-      <header className="h-16 bg-[#030305]/90 border-b border-purple-500/15 lg:ml-72 lg:w-[calc(100%_-_18rem)]" />
+      <header className="h-16 w-full min-w-0 bg-[#030305]/90 border-b border-purple-500/15" />
     }>
       <HeaderInner
         onToggleSidebar={onToggleSidebar}
@@ -77,12 +77,12 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
   };
 
   return (
-    <header className="min-h-16 w-full min-w-0 max-w-full bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between gap-3 px-3 sm:px-6 sticky top-0 z-30 lg:ml-72 lg:w-[calc(100%_-_18rem)] select-none">
+    <header className="relative min-h-16 w-full min-w-0 max-w-full bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between gap-3 px-3 sm:px-6 sticky top-0 z-30 select-none">
       {/* Left side: SOC Quick Filters & Search */}
-      <div className="flex items-center gap-3 flex-1 min-w-0 max-w-2xl">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
         <button type="button" onClick={onToggleSidebar} aria-label="Open navigation menu" className="lg:hidden shrink-0 rounded-lg border border-purple-500/20 bg-[#0B0A10] p-2 text-purple-300 hover:bg-[#0F0E18]"><Menu className="w-5 h-5" /></button>
         {/* SOC Filter Chips */}
-        <div className="hidden 2xl:flex items-center space-x-2 text-[11px] font-mono">
+        <div className="hidden min-[1920px]:flex items-center space-x-2 text-[11px] font-mono">
           <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#0B0A10] border border-purple-500/15 text-zinc-400 hover:text-white transition-colors cursor-pointer">
             <span className="text-purple-300 font-semibold">Team:</span>
             <span>{activeFilterTeam}</span>
@@ -120,7 +120,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
       {/* Right Controls */}
       <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-3.5 xl:gap-2 pl-1 sm:pl-4 xl:pl-2 shrink-0">
         {/* Organization Tier Badge */}
-        <div className="hidden xl:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/15 px-3 py-1.5 rounded-lg text-xs">
+        <div className="hidden min-[1920px]:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/15 px-3 py-1.5 rounded-lg text-xs">
           <Building2 className="w-3.5 h-3.5 text-purple-400" />
           <span className="text-white font-medium truncate max-w-[140px]">{displayOrg}</span>
           <span className="text-[10px] font-mono text-purple-300 bg-purple-950/50 px-1.5 py-0.2 rounded border border-purple-500/30">
@@ -129,7 +129,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
         </div>
 
         {/* Posture Score Pill */}
-        <div className="hidden sm:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/20 px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(147,51,234,0.15)]">
+        <div className="hidden min-[1920px]:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/20 px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(147,51,234,0.15)]">
           <ShieldCheck className="w-4 h-4 text-purple-400" />
           <span className="text-zinc-400 hidden sm:inline">{t('header.posture', 'Posture')}:</span>
           <span className="text-white font-mono font-bold">78.5%</span>
@@ -139,10 +139,13 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
         {/* Run Investigation Action Button */}
         <button
           onClick={onOpenQuickInvestigate}
-          className="hidden 2xl:flex items-center space-x-1.5 bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all"
+          type="button"
+          aria-label={t('header.newInvestigation', 'New Investigation')}
+          title={t('header.newInvestigation', 'New Investigation')}
+          className="hidden lg:flex shrink-0 items-center space-x-1.5 bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 px-2.5 xl:px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all pointer-events-auto"
         >
           <Zap className="w-3.5 h-3.5 fill-purple-500 text-purple-400" />
-          <span>{t('header.newInvestigation', 'New Investigation')}</span>
+          <span className="hidden xl:inline">{t('header.newInvestigation', 'New Investigation')}</span>
         </button>
 
         {/* AI Assistant Toggle Button */}
@@ -209,8 +212,8 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
               {initials}
             </div>
             <div className="hidden xl:block text-left">
-              <div className="text-xs font-medium text-white max-w-[130px] truncate">{displayName}</div>
-              <div className="text-[10px] text-zinc-400 font-mono truncate max-w-[130px]">{displayRole}</div>
+              <div className="text-xs font-medium text-white max-w-[160px] 2xl:max-w-[200px] truncate">{displayName}</div>
+              <div className="text-[10px] text-zinc-400 font-mono truncate max-w-[160px] 2xl:max-w-[200px]">{displayRole}</div>
             </div>
             <ChevronDown className={`w-3 h-3 text-zinc-500 transition-transform ${showUserMenu ? 'rotate-180 text-purple-400' : ''}`} />
           </button>

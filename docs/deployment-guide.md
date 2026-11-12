@@ -14,8 +14,8 @@
 - After deployment, verify `https://<backend-domain>/api/health`; this endpoint also checks the database connection.
 
 ### Vercel Frontend
-- Set `NEXT_PUBLIC_API_URL` to `https://<backend-domain>/api` in the Vercel environment used to build the frontend.
-- Keep the backend's `CORS_ORIGINS` aligned with the exact deployed frontend origin. The local API fallback is only for local development.
+- Set `NEXT_PUBLIC_API_URL` to `https://<backend-domain>` (or `https://<backend-domain>/api`) in the Vercel environment used to build the frontend.
+- Frontend API requests use the same-origin `/api` path and are forwarded by the Next.js rewrite to `NEXT_PUBLIC_API_URL`, avoiding browser cross-origin fetch failures.
 - Verify `https://<backend-domain>/api/health` before using the deployed frontend. Do not rely on demo fallback data as confirmation that the backend is connected.
 
 ## 2. Environment Variables
