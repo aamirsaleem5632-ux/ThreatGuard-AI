@@ -44,7 +44,7 @@ const DOMAIN_CARDS = [
 export default function HomePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#030305] flex items-center justify-center font-mono text-zinc-400">
+      <div className="min-h-screen bg-[#030705] flex items-center justify-center font-mono text-zinc-400">
         Loading...
       </div>
     }>
@@ -72,7 +72,7 @@ function HomeContent() {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className="lg:col-span-7 space-y-6 text-left"
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0B0A10] border border-purple-500/25 text-xs font-mono text-purple-300 shadow-[0_0_15px_rgba(147,51,234,0.15)]">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#07110A] border border-purple-500/25 text-xs font-mono text-purple-300 shadow-[0_0_15px_rgba(104,166,109,0.15)]">
               <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
               <span>{t('hero.badge', 'Next-Generation Autonomous Security Operations (ASO)')}</span>
             </div>
@@ -80,7 +80,7 @@ function HomeContent() {
             <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
               {t('hero.titleLine1', 'Secure Your Digital World')}{' '}
               <br />
-              <span className="purple-gradient-text drop-shadow-[0_4px_25px_rgba(147,51,234,0.35)]">
+              <span className="purple-gradient-text drop-shadow-[0_4px_25px_rgba(104,166,109,0.35)]">
                 {t('hero.titleLine2', 'Effectively & Autonomously')}
               </span>
             </h1>
@@ -96,7 +96,7 @@ function HomeContent() {
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
                 <Link
                   href="/command-center"
-                  className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-900/50 via-violet-800/40 to-purple-900/50 hover:brightness-110 text-white font-bold border border-purple-500/35 shadow-[0_0_20px_rgba(147,51,234,0.25)] text-sm transition-all"
+                  className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-900/50 via-violet-800/40 to-purple-900/50 hover:brightness-110 text-white font-bold border border-purple-500/35 shadow-[0_0_20px_rgba(104,166,109,0.25)] text-sm transition-all"
                 >
                   <span>{t('hero.ctaPrimary', 'Enter Command Center')}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -106,7 +106,7 @@ function HomeContent() {
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
                 <Link
                   href="/solutions"
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#0B0A10] hover:bg-[#0F0E18] text-white border border-purple-500/15 hover:border-purple-500/40 font-semibold text-sm transition-all shadow-sm"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#07110A] hover:bg-[#0C1A10] text-white border border-purple-500/15 hover:border-purple-500/40 font-semibold text-sm transition-all shadow-sm"
                 >
                   <span>{t('hero.exploreSolutions', 'Explore 12 Domains')}</span>
                   <ChevronRight className="w-4 h-4 text-purple-400" />
@@ -140,27 +140,27 @@ function HomeContent() {
           >
             {/* Outer Rotating Cyber Rings */}
             <div className="relative w-72 h-88 sm:w-80 sm:h-96 flex items-center justify-center">
-              <svg viewBox="0 0 320 380" className="w-full h-full overflow-visible drop-shadow-[0_0_35px_rgba(147,51,234,0.35)]">
+              <svg viewBox="0 0 320 380" className="w-full h-full overflow-visible drop-shadow-[0_0_35px_rgba(104,166,109,0.35)]">
                 <defs>
                   {/* Metallic Violet & Purple Gradient */}
                   <linearGradient id="shieldPurpleRim" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#D8B4FE" />
-                    <stop offset="35%" stopColor="#C084FC" />
-                    <stop offset="70%" stopColor="#8B5CF6" />
-                    <stop offset="100%" stopColor="#6D28D9" />
+                    <stop offset="0%" stopColor="#CBE5B9" />
+                    <stop offset="35%" stopColor="#A8CE91" />
+                    <stop offset="70%" stopColor="#5D9860" />
+                    <stop offset="100%" stopColor="#245A34" />
                   </linearGradient>
 
                   {/* Inner Matte Obsidian Charcoal Gradient */}
                   <linearGradient id="shieldCoreDark" x1="50%" y1="0%" x2="50%" y2="100%">
-                    <stop offset="0%" stopColor="#0F0E18" />
-                    <stop offset="50%" stopColor="#0B0A10" />
-                    <stop offset="100%" stopColor="#030305" />
+                    <stop offset="0%" stopColor="#0C1A10" />
+                    <stop offset="50%" stopColor="#07110A" />
+                    <stop offset="100%" stopColor="#030705" />
                   </linearGradient>
 
                   {/* Glowing Lilac Circuit Accent */}
                   <linearGradient id="circuitPurple" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#D8B4FE" />
-                    <stop offset="100%" stopColor="#8B5CF6" />
+                    <stop offset="0%" stopColor="#CBE5B9" />
+                    <stop offset="100%" stopColor="#5D9860" />
                   </linearGradient>
 
                   <filter id="glowPurple" x="-20%" y="-20%" width="140%" height="140%">
@@ -173,7 +173,7 @@ function HomeContent() {
                 <path
                   d="M 160 20 L 280 75 C 280 215 160 340 160 340 C 160 340 40 215 40 75 Z"
                   fill="none"
-                  stroke="#8B5CF6"
+                  stroke="#5D9860"
                   strokeWidth="2"
                   opacity="0.3"
                   filter="url(#glowPurple)"
@@ -199,34 +199,34 @@ function HomeContent() {
                 />
 
                 {/* High-Tech Circuit Lines and Node Dots */}
-                <circle cx="160" cy="170" r="42" fill="none" stroke="#8B5CF6" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.6" className="animate-spin-slow" />
+                <circle cx="160" cy="170" r="42" fill="none" stroke="#5D9860" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.6" className="animate-spin-slow" />
 
                 {/* Cyber Bug / Threat Defense Core Icon */}
                 <g transform="translate(132, 142) scale(1.15)">
                   <path
                     d="M 24 6 C 14 6 12 14 12 18 L 12 24 L 36 24 L 36 18 C 36 14 34 6 24 6 Z"
                     fill="none"
-                    stroke="#A855F7"
+                    stroke="#51945A"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                   />
-                  <rect x="8" y="24" width="32" height="24" rx="4" fill="#0F0E18" stroke="#A855F7" strokeWidth="2.5" />
-                  <circle cx="24" cy="34" r="3.5" fill="#C084FC" />
-                  <path d="M 24 37 L 24 43" stroke="#C084FC" strokeWidth="2.5" strokeLinecap="round" />
+                  <rect x="8" y="24" width="32" height="24" rx="4" fill="#0C1A10" stroke="#51945A" strokeWidth="2.5" />
+                  <circle cx="24" cy="34" r="3.5" fill="#A4CB94" />
+                  <path d="M 24 37 L 24 43" stroke="#A4CB94" strokeWidth="2.5" strokeLinecap="round" />
                 </g>
 
                 {/* Horizontal Scanning Cyber Ray */}
-                <line x1="80" y1="185" x2="240" y2="185" stroke="#A855F7" strokeWidth="1.5" opacity="0.75" className="animate-pulse" />
+                <line x1="80" y1="185" x2="240" y2="185" stroke="#51945A" strokeWidth="1.5" opacity="0.75" className="animate-pulse" />
               </svg>
 
               {/* Floating Orbiting Satellite Badge */}
-              <div className="absolute -top-2 right-4 px-3 py-1.5 rounded-full bg-[#0F0E18]/90 border border-purple-500/35 text-purple-300 text-[10px] font-mono shadow-[0_0_15px_rgba(147,51,234,0.2)] flex items-center gap-1.5 backdrop-blur-md">
+              <div className="absolute -top-2 right-4 px-3 py-1.5 rounded-full bg-[#0C1A10]/90 border border-purple-500/35 text-purple-300 text-[10px] font-mono shadow-[0_0_15px_rgba(104,166,109,0.2)] flex items-center gap-1.5 backdrop-blur-md">
                 <Sparkles className="w-3 h-3 text-purple-400" />
                 <span>Zero-Trust Shield Active</span>
               </div>
 
               {/* Floating Bottom Telemetry Badge */}
-              <div className="absolute -bottom-3 left-4 px-3 py-1.5 rounded-full bg-[#0F0E18]/90 border border-purple-500/35 text-purple-300 text-[10px] font-mono shadow-[0_0_15px_rgba(147,51,234,0.2)] flex items-center gap-1.5 backdrop-blur-md">
+              <div className="absolute -bottom-3 left-4 px-3 py-1.5 rounded-full bg-[#0C1A10]/90 border border-purple-500/35 text-purple-300 text-[10px] font-mono shadow-[0_0_15px_rgba(104,166,109,0.2)] flex items-center gap-1.5 backdrop-blur-md">
                 <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
                 <span>14,872 Threats Intercepted</span>
               </div>
@@ -245,13 +245,13 @@ function HomeContent() {
             transition={{ duration: 0.4 }}
             whileHover={{
               scale: 1.02,
-              boxShadow: '0 0 25px rgba(147, 51, 234, 0.25)',
-              borderColor: 'rgba(147, 51, 234, 0.40)'
+              boxShadow: '0 0 25px rgba(104, 166, 109, 0.25)',
+              borderColor: 'rgba(104, 166, 109, 0.40)'
             }}
             className="cyber-glass p-7 rounded-2xl flex flex-col justify-between shadow-xl group cursor-default"
           >
             <div className="space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#080714] border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(147,51,234,0.2)] group-hover:border-purple-500/50 transition-colors">
+              <div className="w-14 h-14 rounded-2xl bg-[#08130B] border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(104,166,109,0.2)] group-hover:border-purple-500/50 transition-colors">
                 <Lock className="w-7 h-7 text-purple-400" />
               </div>
               <h3 className="text-xl font-bold text-white tracking-wide group-hover:text-purple-300 transition-colors">
@@ -268,7 +268,7 @@ function HomeContent() {
             <div className="pt-6 mt-6 border-t border-purple-500/15">
               <Link
                 href="/endpoint-security"
-                className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[#030305] border border-purple-500/15 group-hover:border-purple-500/40 text-xs font-mono text-white group-hover:text-purple-300 transition-all"
+                className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[#030705] border border-purple-500/15 group-hover:border-purple-500/40 text-xs font-mono text-white group-hover:text-purple-300 transition-all"
               >
                 <span>{t('hero.learnMore', 'Learn More')}</span>
                 <ChevronRight className="w-3.5 h-3.5 ml-1" />
@@ -283,17 +283,17 @@ function HomeContent() {
             transition={{ duration: 0.4, delay: 0.1 }}
             whileHover={{
               scale: 1.03,
-              boxShadow: '0 0 35px rgba(147, 51, 234, 0.35)',
-              borderColor: 'rgba(147, 51, 234, 0.6)'
+              boxShadow: '0 0 35px rgba(104, 166, 109, 0.35)',
+              borderColor: 'rgba(104, 166, 109, 0.6)'
             }}
-            className="cyber-glass-purple p-7 rounded-2xl flex flex-col justify-between shadow-[0_0_35px_rgba(147,51,234,0.25)] relative group cursor-default"
+            className="cyber-glass-purple p-7 rounded-2xl flex flex-col justify-between shadow-[0_0_35px_rgba(104,166,109,0.25)] relative group cursor-default"
           >
             <div className="absolute -top-3 right-5 px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-mono font-bold tracking-wider uppercase">
               Primary Defense
             </div>
 
             <div className="space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#030305] border border-purple-500/40 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(147,51,234,0.3)]">
+              <div className="w-14 h-14 rounded-2xl bg-[#030705] border border-purple-500/40 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(104,166,109,0.3)]">
                 <ShieldAlert className="w-7 h-7 text-purple-400" />
               </div>
               <h3 className="text-xl font-bold text-white tracking-wide group-hover:text-purple-300 transition-colors">
@@ -310,7 +310,7 @@ function HomeContent() {
             <div className="pt-6 mt-6 border-t border-purple-500/20">
               <Link
                 href="/soc"
-                className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-900/40 via-violet-800/30 to-purple-900/40 border border-purple-500/40 text-xs font-mono font-bold text-purple-200 hover:bg-purple-900/50 transition-all shadow-[0_0_15px_rgba(147,51,234,0.25)]"
+                className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-900/40 via-violet-800/30 to-purple-900/40 border border-purple-500/40 text-xs font-mono font-bold text-purple-200 hover:bg-purple-900/50 transition-all shadow-[0_0_15px_rgba(104,166,109,0.25)]"
               >
                 <span>{t('hero.learnMore', 'Learn More')}</span>
                 <ChevronRight className="w-3.5 h-3.5 ml-1" />
@@ -325,13 +325,13 @@ function HomeContent() {
             transition={{ duration: 0.4, delay: 0.2 }}
             whileHover={{
               scale: 1.02,
-              boxShadow: '0 0 25px rgba(139, 92, 246, 0.25)',
-              borderColor: 'rgba(139, 92, 246, 0.40)'
+              boxShadow: '0 0 25px rgba(98, 153, 91, 0.25)',
+              borderColor: 'rgba(98, 153, 91, 0.40)'
             }}
             className="cyber-glass p-7 rounded-2xl flex flex-col justify-between shadow-xl group cursor-default"
           >
             <div className="space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#080714] border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(147,51,234,0.2)] group-hover:border-purple-500/50 transition-colors">
+              <div className="w-14 h-14 rounded-2xl bg-[#08130B] border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(104,166,109,0.2)] group-hover:border-purple-500/50 transition-colors">
                 <ShieldCheck className="w-7 h-7 text-purple-400" />
               </div>
               <h3 className="text-xl font-bold text-white tracking-wide group-hover:text-purple-300 transition-colors">
@@ -348,7 +348,7 @@ function HomeContent() {
             <div className="pt-6 mt-6 border-t border-purple-500/15">
               <Link
                 href="/identity-security"
-                className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[#030305] border border-purple-500/15 group-hover:border-purple-500/40 text-xs font-mono text-white group-hover:text-purple-300 transition-all"
+                className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[#030705] border border-purple-500/15 group-hover:border-purple-500/40 text-xs font-mono text-white group-hover:text-purple-300 transition-all"
               >
                 <span>{t('hero.learnMore', 'Learn More')}</span>
                 <ChevronRight className="w-3.5 h-3.5 ml-1" />
@@ -363,7 +363,7 @@ function HomeContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="p-8 sm:p-12 rounded-3xl bg-[#0B0A10]/90 border border-purple-500/15 space-y-8 relative overflow-hidden"
+        className="p-8 sm:p-12 rounded-3xl bg-[#07110A]/90 border border-purple-500/15 space-y-8 relative overflow-hidden"
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-6">
@@ -413,7 +413,7 @@ function HomeContent() {
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-block">
                 <Link
                   href="/command-center"
-                  className="inline-flex items-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-purple-900/40 via-violet-800/30 to-purple-900/40 hover:from-purple-800/50 hover:to-violet-700/40 text-purple-200 border border-purple-500/40 font-mono text-xs font-bold shadow-[0_0_15px_rgba(147,51,234,0.25)] transition-all"
+                  className="inline-flex items-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-purple-900/40 via-violet-800/30 to-purple-900/40 hover:from-purple-800/50 hover:to-violet-700/40 text-purple-200 border border-purple-500/40 font-mono text-xs font-bold shadow-[0_0_15px_rgba(104,166,109,0.25)] transition-all"
                 >
                   <span>Launch Security Operations Center</span>
                   <ArrowRight className="w-4 h-4" />
@@ -428,7 +428,7 @@ function HomeContent() {
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             className="lg:col-span-6 relative cursor-default"
           >
-            <div className="rounded-2xl border-2 border-purple-500/15 bg-[#030305]/95 p-4 shadow-2xl space-y-3">
+            <div className="rounded-2xl border-2 border-purple-500/15 bg-[#030705]/95 p-4 shadow-2xl space-y-3">
               {/* Fake Browser / Laptop Window Bar */}
               <div className="flex items-center justify-between pb-2 border-b border-purple-500/15 text-[11px] font-mono text-zinc-400">
                 <div className="flex items-center space-x-1.5">
@@ -443,22 +443,22 @@ function HomeContent() {
               {/* Mini Mock Dashboard Content */}
               <div className="space-y-3">
                 <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-                  <div className="p-2.5 rounded-lg bg-[#0B0A10] border border-purple-500/15">
+                  <div className="p-2.5 rounded-lg bg-[#07110A] border border-purple-500/15">
                     <div className="text-[9px] text-zinc-500">Security Score</div>
                     <div className="text-lg font-bold text-white mt-1">98%</div>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#0B0A10] border border-purple-500/15">
+                  <div className="p-2.5 rounded-lg bg-[#07110A] border border-purple-500/15">
                     <div className="text-[9px] text-zinc-500">Blocked Threats</div>
                     <div className="text-lg font-bold text-purple-300 mt-1">14,872</div>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#0B0A10] border border-purple-500/15">
+                  <div className="p-2.5 rounded-lg bg-[#07110A] border border-purple-500/15">
                     <div className="text-[9px] text-zinc-500">Active Radar</div>
                     <div className="text-lg font-bold text-violet-300 mt-1">983 Sources</div>
                   </div>
                 </div>
 
                 {/* Mini Waveform & Attack Volume */}
-                <div className="p-3 rounded-lg bg-[#0B0A10] border border-purple-500/15 space-y-1.5">
+                <div className="p-3 rounded-lg bg-[#07110A] border border-purple-500/15 space-y-1.5">
                   <div className="flex items-center justify-between text-[10px] font-mono">
                     <span className="text-white font-semibold">Attack Volume Trend</span>
                     <span className="text-purple-300">983,421 Events</span>
@@ -498,18 +498,18 @@ function HomeContent() {
                 key={domain.id}
                 whileHover={{
                   scale: 1.02,
-                  boxShadow: '0 0 20px rgba(147, 51, 234, 0.25)',
-                  borderColor: 'rgba(147, 51, 234, 0.40)'
+                  boxShadow: '0 0 20px rgba(104, 166, 109, 0.25)',
+                  borderColor: 'rgba(104, 166, 109, 0.40)'
                 }}
                 transition={{ type: 'spring', stiffness: 350, damping: 22 }}
-                className="rounded-2xl border border-purple-500/15 bg-[#0B0A10]/80 flex flex-col justify-between overflow-hidden"
+                className="rounded-2xl border border-purple-500/15 bg-[#07110A]/80 flex flex-col justify-between overflow-hidden"
               >
                 <Link
                   href={`/${domain.id}`}
                   className="group p-5 flex flex-col justify-between h-full"
                 >
                   <div>
-                    <div className="w-10 h-10 rounded-xl bg-[#030305] border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:text-white group-hover:border-purple-500/50 transition-colors mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-[#030705] border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:text-white group-hover:border-purple-500/50 transition-colors mb-4">
                       <Icon className="w-5 h-5" />
                     </div>
                     <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
@@ -530,6 +530,9 @@ function HomeContent() {
           })}
         </div>
       </section>
+      <footer className="border-t border-purple-500/15 pt-6 text-center text-xs font-mono text-zinc-400">
+        © ThreatGuard AI. All rights reserved.
+      </footer>
     </div>
   );
 }

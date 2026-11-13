@@ -142,15 +142,15 @@ function CyberGlobeMesh({
   // Global Threat Cities mapped to 3D positions on radius 2.0 (Strict Obsidian Purple/Violet Aesthetic)
   const nodes = useMemo(() => {
     return [
-      { id: 'nyc', label: 'US-East (New York)', lat: 40.71, lon: -74.0, count: 142, color: '#C084FC' },
-      { id: 'sfo', label: 'US-West (San Francisco)', lat: 37.77, lon: -122.41, count: 88, color: '#A855F7' },
-      { id: 'fra', label: 'EU-Central (Frankfurt)', lat: 50.11, lon: 8.68, count: 320, color: '#8B5CF6' },
-      { id: 'lon', label: 'EU-West (London)', lat: 51.5, lon: -0.12, count: 175, color: '#D8B4FE' },
-      { id: 'tok', label: 'AP-East (Tokyo)', lat: 35.67, lon: 139.65, count: 284, color: '#A855F7' },
-      { id: 'sin', label: 'AP-South (Singapore)', lat: 1.35, lon: 103.81, count: 98, color: '#8B5CF6' },
-      { id: 'syd', label: 'AP-Southeast (Sydney)', lat: -33.86, lon: 151.2, count: 64, color: '#A855F7' },
-      { id: 'sao', label: 'SA-East (São Paulo)', lat: -23.55, lon: -46.63, count: 67, color: '#8B5CF6' },
-      { id: 'dxb', label: 'ME-Central (Dubai)', lat: 25.2, lon: 55.27, count: 72, color: '#C084FC' },
+      { id: 'nyc', label: 'US-East (New York)', lat: 40.71, lon: -74.0, count: 142, color: '#A4CB94' },
+      { id: 'sfo', label: 'US-West (San Francisco)', lat: 37.77, lon: -122.41, count: 88, color: '#51945A' },
+      { id: 'fra', label: 'EU-Central (Frankfurt)', lat: 50.11, lon: 8.68, count: 320, color: '#5D9860' },
+      { id: 'lon', label: 'EU-West (London)', lat: 51.5, lon: -0.12, count: 175, color: '#CBE5B9' },
+      { id: 'tok', label: 'AP-East (Tokyo)', lat: 35.67, lon: 139.65, count: 284, color: '#51945A' },
+      { id: 'sin', label: 'AP-South (Singapore)', lat: 1.35, lon: 103.81, count: 98, color: '#5D9860' },
+      { id: 'syd', label: 'AP-Southeast (Sydney)', lat: -33.86, lon: 151.2, count: 64, color: '#51945A' },
+      { id: 'sao', label: 'SA-East (São Paulo)', lat: -23.55, lon: -46.63, count: 67, color: '#5D9860' },
+      { id: 'dxb', label: 'ME-Central (Dubai)', lat: 25.2, lon: 55.27, count: 72, color: '#A4CB94' },
     ].map((n) => ({
       ...n,
       pos: latLongToVector3(n.lat, n.lon, 2.0),
@@ -161,12 +161,12 @@ function CyberGlobeMesh({
   const flightArcs = useMemo(() => {
     const getNode = (id: string) => nodes.find((n) => n.id === id);
     return [
-      { from: getNode('fra')!, to: getNode('nyc')!, color: '#8B5CF6', elev: 0.65 },
-      { from: getNode('tok')!, to: getNode('sfo')!, color: '#A855F7', elev: 0.75 },
-      { from: getNode('fra')!, to: getNode('tok')!, color: '#C084FC', elev: 0.8 },
-      { from: getNode('lon')!, to: getNode('dxb')!, color: '#D8B4FE', elev: 0.5 },
-      { from: getNode('sin')!, to: getNode('syd')!, color: '#8B5CF6', elev: 0.55 },
-      { from: getNode('nyc')!, to: getNode('sao')!, color: '#A855F7', elev: 0.6 },
+      { from: getNode('fra')!, to: getNode('nyc')!, color: '#5D9860', elev: 0.65 },
+      { from: getNode('tok')!, to: getNode('sfo')!, color: '#51945A', elev: 0.75 },
+      { from: getNode('fra')!, to: getNode('tok')!, color: '#A4CB94', elev: 0.8 },
+      { from: getNode('lon')!, to: getNode('dxb')!, color: '#CBE5B9', elev: 0.5 },
+      { from: getNode('sin')!, to: getNode('syd')!, color: '#5D9860', elev: 0.55 },
+      { from: getNode('nyc')!, to: getNode('sao')!, color: '#51945A', elev: 0.6 },
     ];
   }, [nodes]);
 
@@ -192,10 +192,10 @@ function CyberGlobeMesh({
         <mesh>
           <sphereGeometry args={[1.96, 48, 48]} />
           <meshStandardMaterial
-            color="#030305"
+            color="#030705"
             roughness={0.7}
             metalness={0.8}
-            emissive="#0B0A10"
+            emissive="#07110A"
             emissiveIntensity={0.25}
           />
         </mesh>
@@ -204,9 +204,9 @@ function CyberGlobeMesh({
         <mesh>
           <sphereGeometry args={[2.0, 36, 36]} />
           <meshStandardMaterial
-            color="#8B5CF6"
+            color="#5D9860"
             wireframe
-            emissive="#7C3AED"
+            emissive="#3E7948"
             emissiveIntensity={0.65}
             transparent
             opacity={0.35}
@@ -216,15 +216,15 @@ function CyberGlobeMesh({
         {/* Equatorial & Latitude Purple Neon Rings */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[2.005, 2.02, 64]} />
-          <meshBasicMaterial color="#A855F7" side={THREE.DoubleSide} transparent opacity={0.65} />
+          <meshBasicMaterial color="#51945A" side={THREE.DoubleSide} transparent opacity={0.65} />
         </mesh>
         <mesh rotation={[Math.PI / 3, 0, 0]}>
           <ringGeometry args={[2.005, 2.015, 64]} />
-          <meshBasicMaterial color="#8B5CF6" side={THREE.DoubleSide} transparent opacity={0.45} />
+          <meshBasicMaterial color="#5D9860" side={THREE.DoubleSide} transparent opacity={0.45} />
         </mesh>
         <mesh rotation={[-Math.PI / 3, 0, 0]}>
           <ringGeometry args={[2.005, 2.015, 64]} />
-          <meshBasicMaterial color="#6D28D9" side={THREE.DoubleSide} transparent opacity={0.45} />
+          <meshBasicMaterial color="#245A34" side={THREE.DoubleSide} transparent opacity={0.45} />
         </mesh>
 
         {/* Surface Threat Node Markers */}
@@ -257,9 +257,9 @@ function CyberGlobeMesh({
         <mesh ref={purpleHaloRef}>
           <icosahedronGeometry args={[2.28, 1]} />
           <meshStandardMaterial
-            color="#8B5CF6"
+            color="#5D9860"
             wireframe
-            emissive="#A855F7"
+            emissive="#51945A"
             emissiveIntensity={0.55}
             transparent
             opacity={0.18}
@@ -269,7 +269,7 @@ function CyberGlobeMesh({
         {/* Planetary Orbital Ring */}
         <mesh rotation={[Math.PI / 2.3, 0.4, 0]}>
           <ringGeometry args={[2.6, 2.62, 96]} />
-          <meshBasicMaterial color="#7C3AED" side={THREE.DoubleSide} transparent opacity={0.3} />
+          <meshBasicMaterial color="#3E7948" side={THREE.DoubleSide} transparent opacity={0.3} />
         </mesh>
       </group>
     </group>
@@ -317,18 +317,18 @@ function HolographicRadarFallback({
   railState: boolean;
 }) {
   const radarNodes = [
-    { id: 'fra', label: 'EU-Central (Frankfurt)', x: 48, y: 38, count: 320, color: '#8B5CF6' },
-    { id: 'nyc', label: 'US-East (New York)', x: 28, y: 44, count: 142, color: '#C084FC' },
-    { id: 'tok', label: 'AP-East (Tokyo)', x: 78, y: 46, count: 284, color: '#A855F7' },
-    { id: 'sin', label: 'AP-South (Singapore)', x: 68, y: 62, count: 98, color: '#8B5CF6' },
-    { id: 'lon', label: 'EU-West (London)', x: 44, y: 34, count: 175, color: '#D8B4FE' },
-    { id: 'syd', label: 'AP-Southeast (Sydney)', x: 84, y: 76, count: 64, color: '#A855F7' },
+    { id: 'fra', label: 'EU-Central (Frankfurt)', x: 48, y: 38, count: 320, color: '#5D9860' },
+    { id: 'nyc', label: 'US-East (New York)', x: 28, y: 44, count: 142, color: '#A4CB94' },
+    { id: 'tok', label: 'AP-East (Tokyo)', x: 78, y: 46, count: 284, color: '#51945A' },
+    { id: 'sin', label: 'AP-South (Singapore)', x: 68, y: 62, count: 98, color: '#5D9860' },
+    { id: 'lon', label: 'EU-West (London)', x: 44, y: 34, count: 175, color: '#CBE5B9' },
+    { id: 'syd', label: 'AP-Southeast (Sydney)', x: 84, y: 76, count: 64, color: '#51945A' },
   ];
 
   return (
-    <div className="relative w-full h-[320px] rounded-xl overflow-hidden bg-[#030305]/90 border border-purple-500/15 flex items-center justify-center select-none">
+    <div className="relative w-full h-[320px] rounded-xl overflow-hidden bg-[#030705]/90 border border-purple-500/15 flex items-center justify-center select-none">
       {/* Background radial purple ambient glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(147,51,234,0.12)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(81,148,90,0.12)_0%,transparent_70%)] pointer-events-none" />
 
       {/* Grid crosshairs */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
@@ -354,9 +354,9 @@ function HolographicRadarFallback({
 
         {/* Threat Trajectory Arcs */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
-          <path d="M 122 97 Q 95 105 71 112" fill="none" stroke="#A78BFA" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.7" />
-          <path d="M 122 97 Q 160 100 199 117" fill="none" stroke="#C084FC" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.6" />
-          <path d="M 199 117 Q 185 140 174 158" fill="none" stroke="#8B5CF6" strokeWidth="1.5" opacity="0.5" />
+          <path d="M 122 97 Q 95 105 71 112" fill="none" stroke="#A8CE91" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.7" />
+          <path d="M 122 97 Q 160 100 199 117" fill="none" stroke="#A4CB94" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.6" />
+          <path d="M 199 117 Q 185 140 174 158" fill="none" stroke="#5D9860" strokeWidth="1.5" opacity="0.5" />
         </svg>
 
         {/* Active Node Pins */}
@@ -382,7 +382,7 @@ function HolographicRadarFallback({
 
       {/* Floating Node Telemetry Tooltip */}
       {activeTooltip && (
-        <div className="absolute top-4 right-4 pointer-events-none bg-[#0B0A10]/95 border border-purple-500/30 px-3.5 py-2 rounded-xl text-xs font-mono text-white shadow-[0_0_20px_rgba(147,51,234,0.3)] backdrop-blur-md animate-in fade-in zoom-in-95 z-20">
+        <div className="absolute top-4 right-4 pointer-events-none bg-[#07110A]/95 border border-purple-500/30 px-3.5 py-2 rounded-xl text-xs font-mono text-white shadow-[0_0_20px_rgba(104,166,109,0.3)] backdrop-blur-md animate-in fade-in zoom-in-95 z-20">
           <div className="text-purple-300 font-bold flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
             <span>{activeTooltip.label}</span>
@@ -394,7 +394,7 @@ function HolographicRadarFallback({
       )}
 
       {/* Status Hint */}
-      <div className="absolute bottom-2.5 left-3 flex items-center gap-2 pointer-events-none text-[10px] font-mono text-zinc-400 bg-[#030305]/80 px-2.5 py-1 rounded-md border border-purple-500/15 backdrop-blur-sm z-10">
+      <div className="absolute bottom-2.5 left-3 flex items-center gap-2 pointer-events-none text-[10px] font-mono text-zinc-400 bg-[#030705]/80 px-2.5 py-1 rounded-md border border-purple-500/15 backdrop-blur-sm z-10">
         <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
         <span>Holographic Threat Radar</span>
         <span className="text-violet-300">• Telemetry Active</span>

@@ -16,9 +16,7 @@ import {
   Sparkles,
   ChevronDown,
   LogOut,
-  User as UserIcon,
-  Settings as SettingsIcon,
-  Shield
+  Settings as SettingsIcon
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -48,8 +46,6 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [activeFilterTeam, setActiveFilterTeam] = useState('Global SOC');
-  const [activeFilterRegion, setActiveFilterRegion] = useState('Asia Pacific');
 
   const initials = user?.full_name
     ? user.full_name
@@ -77,63 +73,44 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
   };
 
   return (
-    <header className="relative min-h-16 w-full min-w-0 max-w-full bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center justify-between gap-3 px-3 sm:px-6 sticky top-0 z-30 select-none">
-      {/* Left side: SOC Quick Filters & Search */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        <button type="button" onClick={onToggleSidebar} aria-label="Open navigation menu" className="lg:hidden shrink-0 rounded-lg border border-purple-500/20 bg-[#0B0A10] p-2 text-purple-300 hover:bg-[#0F0E18]"><Menu className="w-5 h-5" /></button>
-        {/* SOC Filter Chips */}
-        <div className="hidden min-[1920px]:flex items-center space-x-2 text-[11px] font-mono">
-          <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#0B0A10] border border-purple-500/15 text-zinc-400 hover:text-white transition-colors cursor-pointer">
-            <span className="text-purple-300 font-semibold">Team:</span>
-            <span>{activeFilterTeam}</span>
-            <ChevronDown className="w-3 h-3 text-zinc-500" />
-          </div>
-
-          <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#0B0A10] border border-purple-500/15 text-zinc-400 hover:text-white transition-colors cursor-pointer">
-            <span className="text-violet-300 font-semibold">Region:</span>
-            <span>{activeFilterRegion}</span>
-            <ChevronDown className="w-3 h-3 text-zinc-500" />
-          </div>
+    <header className="relative min-h-16 w-full min-w-0 max-w-full bg-[#030305]/90 backdrop-blur-xl border-b border-purple-500/15 flex items-center gap-2 px-3 sm:px-6 sticky top-0 z-30 select-none">
+      <button
+        type="button"
+        onClick={onToggleSidebar}
+        aria-label="Open navigation menu"
+        className="lg:hidden shrink-0 rounded-lg border border-purple-500/20 bg-[#0B0A10] p-2 text-purple-300 hover:bg-[#0F0E18]"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+      <form onSubmit={handleSearchSubmit} className="w-40 sm:w-52 lg:w-52 xl:w-56 2xl:w-80 min-w-0 shrink-0">
+        <div className="relative">
+          <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t('header.searchPlaceholder', 'Search indicator (IP, Domain, Hash), CVE-2024-..., or alert ID...')}
+            className="w-full min-w-0 bg-[#0B0A10] border border-purple-500/15 rounded-lg pl-10 pr-3 sm:pr-24 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/40 font-mono transition-all"
+          />
+          <button
+            type="submit"
+            className="hidden sm:block absolute right-1.5 top-1/2 -translate-y-1/2 bg-purple-950/60 hover:bg-purple-900/60 text-purple-200 border border-purple-500/30 px-2 py-0.5 rounded text-[11px] font-mono transition-colors"
+          >
+            {t('header.investigate', 'Investigate')}
+          </button>
         </div>
+      </form>
 
-        {/* Search Input Bar */}
-        <form onSubmit={handleSearchSubmit} className="flex-1 min-w-0">
-          <div className="relative">
-            <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t('header.searchPlaceholder', 'Search indicator (IP, Domain, Hash), CVE-2024-..., or alert ID...')}
-              className="w-full min-w-0 bg-[#0B0A10] border border-purple-500/15 rounded-lg pl-10 pr-3 sm:pr-24 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/40 font-mono transition-all"
-            />
-            <button
-              type="submit"
-              className="hidden sm:block absolute right-1.5 top-1/2 -translate-y-1/2 bg-purple-950/60 hover:bg-purple-900/60 text-purple-200 border border-purple-500/30 px-2 py-0.5 rounded text-[11px] font-mono transition-colors"
-            >
-              {t('header.investigate', 'Investigate')}
-            </button>
-          </div>
-        </form>
-      </div>
-
+      <div className="flex-1 min-w-0" />
       {/* Right Controls */}
-      <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-3.5 xl:gap-2 pl-1 sm:pl-4 xl:pl-2 shrink-0">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
         {/* Organization Tier Badge */}
-        <div className="hidden min-[1920px]:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/15 px-3 py-1.5 rounded-lg text-xs">
-          <Building2 className="w-3.5 h-3.5 text-purple-400" />
-          <span className="text-white font-medium truncate max-w-[140px]">{displayOrg}</span>
-          <span className="text-[10px] font-mono text-purple-300 bg-purple-950/50 px-1.5 py-0.2 rounded border border-purple-500/30">
-            {t('header.tier1', 'Tier 1')}
+        <div className="hidden xl:flex shrink-0 items-center gap-1.5 bg-[#0B0A10] border border-purple-500/15 px-2 py-1.5 rounded-lg text-xs">
+          <Building2 className="w-3.5 h-3.5 shrink-0 text-purple-400" />
+          <span className="max-w-[80px] 2xl:max-w-[144px] truncate text-white font-medium" title={displayOrg}>{displayOrg}</span>
+          <span className="whitespace-nowrap shrink-0 text-[10px] font-mono text-purple-300 bg-purple-950/50 px-1.5 py-0.5 rounded border border-purple-500/30">
+            {t('header.tier1', 'Tier 1 Enterprise')}
           </span>
-        </div>
-
-        {/* Posture Score Pill */}
-        <div className="hidden min-[1920px]:flex items-center space-x-2 bg-[#0B0A10] border border-purple-500/20 px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(147,51,234,0.15)]">
-          <ShieldCheck className="w-4 h-4 text-purple-400" />
-          <span className="text-zinc-400 hidden sm:inline">{t('header.posture', 'Posture')}:</span>
-          <span className="text-white font-mono font-bold">78.5%</span>
-          <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
         </div>
 
         {/* Run Investigation Action Button */}
@@ -142,16 +119,26 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
           type="button"
           aria-label={t('header.newInvestigation', 'New Investigation')}
           title={t('header.newInvestigation', 'New Investigation')}
-          className="hidden lg:flex shrink-0 items-center space-x-1.5 bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 px-2.5 xl:px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all pointer-events-auto"
+          className="hidden lg:flex shrink-0 items-center space-x-1.5 bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow-[0_0_15px_rgba(147,51,234,0.2)] transition-all pointer-events-auto"
         >
           <Zap className="w-3.5 h-3.5 fill-purple-500 text-purple-400" />
-          <span className="hidden xl:inline">{t('header.newInvestigation', 'New Investigation')}</span>
+          <span className="hidden 2xl:inline whitespace-nowrap">{t('header.newInvestigation', 'New Investigation')}</span>
         </button>
+
+        {/* Posture Score Pill */}
+        <div className="hidden 2xl:flex shrink-0 items-center space-x-2 bg-[#0B0A10] border border-purple-500/20 px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(147,51,234,0.15)]">
+          <ShieldCheck className="w-4 h-4 text-purple-400" />
+          <span className="text-zinc-400">{t('header.posture', 'Posture')}:</span>
+          <span className="text-white font-mono font-bold">78.5%</span>
+          <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+        </div>
 
         {/* AI Assistant Toggle Button */}
         <button
           onClick={onToggleAssistant}
-          className="flex items-center space-x-1.5 bg-[#0B0A10] hover:bg-[#0F0E18] text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs font-medium shadow-[0_0_15px_rgba(147,51,234,0.15)] transition-colors"
+          type="button"
+          aria-label={t('header.aiCopilot', 'AI Copilot')}
+          className="flex shrink-0 items-center space-x-1.5 bg-[#0B0A10] hover:bg-[#0F0E18] text-purple-300 border border-purple-500/30 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium shadow-[0_0_15px_rgba(147,51,234,0.15)] transition-colors"
         >
           <Sparkles className="w-3.5 h-3.5 text-purple-400" />
           <span className="hidden sm:inline">{t('header.aiCopilot', 'AI Copilot')}</span>
@@ -201,7 +188,7 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
         <div className="hidden sm:block"><LanguageSelector /></div>
 
         {/* User Profile with Dropdown */}
-        <div className="relative pl-2 border-l border-purple-500/15">
+        <div className="relative shrink-0 pl-1.5 sm:pl-2 border-l border-purple-500/15">
           <button
             type="button"
             onClick={() => setShowUserMenu(!showUserMenu)}
@@ -211,9 +198,9 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
             <div className="w-8 h-8 rounded-lg bg-[#0B0A10] border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold text-xs font-mono shadow-[0_0_12px_rgba(147,51,234,0.2)] group-hover:border-purple-500/60 transition-colors">
               {initials}
             </div>
-            <div className="hidden xl:block text-left">
-              <div className="text-xs font-medium text-white max-w-[160px] 2xl:max-w-[200px] truncate">{displayName}</div>
-              <div className="text-[10px] text-zinc-400 font-mono truncate max-w-[160px] 2xl:max-w-[200px]">{displayRole}</div>
+            <div className="hidden lg:block text-left">
+              <div className="whitespace-nowrap text-xs font-medium text-white">{displayName}</div>
+              <div className="hidden 2xl:block text-[10px] text-zinc-400 font-mono truncate max-w-[160px]">{displayRole}</div>
             </div>
             <ChevronDown className={`w-3 h-3 text-zinc-500 transition-transform ${showUserMenu ? 'rotate-180 text-purple-400' : ''}`} />
           </button>
