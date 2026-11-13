@@ -29,8 +29,8 @@ export default function PlatformPage() {
 
       {/* Core Architectural Pillars */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-6 rounded-2xl bg-[#0B0A10] border border-purple-500/15 space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-[#030305] border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(201,168,68,0.25)]">
+        <div className="p-6 rounded-2xl bg-[#07110A] border border-purple-500/15 space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-[#030705] border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(104,166,109,0.25)]">
             <LayoutDashboard className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-bold text-white">Central Security Command Center</h3>
@@ -91,7 +91,7 @@ export default function PlatformPage() {
       </div>
 
       {/* Cross-Module Intelligence Flow */}
-      <div className="p-8 rounded-3xl bg-[#080714]/60 border border-purple-500/15 space-y-6">
+      <div className="p-8 rounded-3xl bg-[#08130B]/60 border border-purple-500/15 space-y-6">
         <h2 className="text-2xl font-bold text-white">The Shared Cyber Intelligence Graph</h2>
         <p className="text-xs sm:text-sm text-zinc-400 font-mono max-w-3xl leading-relaxed">
           When an anomaly is flagged in Email & Phishing (e.g. deceptive link), the intelligence graph propagates the IOC to Network NDR sensors, queries AbuseIPDB and URLhaus, verifies CVE exposure in Vulnerability Management, and informs SOC incident queues automatically.
@@ -100,7 +100,7 @@ export default function PlatformPage() {
         <div className="pt-4 flex flex-wrap gap-4 font-mono text-xs">
           <Link
             href="/graph"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 shadow-[0_0_15px_rgba(201,168,68,0.2)]"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-900/40 via-violet-800/20 to-transparent hover:from-purple-800/50 hover:to-violet-700/30 text-purple-200 border border-purple-500/30 shadow-[0_0_15px_rgba(104,166,109,0.2)]"
           >
             <Network className="w-4 h-4 text-purple-300" />
             <span>Explore Cyber Intelligence Graph</span>

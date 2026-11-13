@@ -126,7 +126,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
         </main>
 
         {/* Auth Footer */}
-        <footer className="border-t border-purple-500/15 bg-[#080714]/70 py-4 px-6 text-center text-xs font-mono text-zinc-500">
+        <footer className="border-t border-purple-500/15 bg-[#08130B]/70 py-4 px-6 text-center text-xs font-mono text-zinc-500">
           <span>ThreatGuard AI Enterprise Security • Autonomous SOC & Threat Intelligence</span>
         </footer>
       </div>
@@ -135,11 +135,11 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
 
   if (isMarketing) {
     return (
-      <div className="min-h-screen bg-[#030305] text-white cyber-grid-pattern flex flex-col">
+      <div className="min-h-screen bg-[#030705] text-white cyber-grid-pattern flex flex-col">
         {/* Public Marketing Header with Obsidian Purple theme + Language Selector */}
-        <header className="h-20 border-b border-purple-500/15 bg-[#030305]/85 backdrop-blur-xl sticky top-0 z-50 px-6 lg:px-12 flex items-center justify-between">
+        <header className="h-20 border-b border-purple-500/15 bg-[#030705]/85 backdrop-blur-xl sticky top-0 z-50 px-6 lg:px-12 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#080714] border border-purple-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(147,51,234,0.25)] group-hover:border-purple-500/50 transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-[#08130B] border border-purple-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(104,166,109,0.25)] group-hover:border-purple-500/50 transition-colors">
               <ShieldAlert className="w-6 h-6 text-purple-400" />
             </div>
             <div>

@@ -18,13 +18,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className="antialiased selection:bg-purple-500/30 selection:text-purple-300 bg-[#030305] text-white" suppressHydrationWarning>
+      <body className="antialiased selection:bg-purple-500/30 selection:text-purple-300 bg-[#030705] text-white" suppressHydrationWarning>
         <ErrorBoundary name="RootApp">
           <LanguageProvider>
             <AuthProvider>
               {/* Suspense required: AppShell uses usePathname/useRouter hooks */}
               <Suspense fallback={
-                <div className="min-h-screen bg-[#030305] flex items-center justify-center">
+                <div className="min-h-screen bg-[#030705] flex items-center justify-center">
                   <div className="w-8 h-8 border-2 border-purple-600/40 border-t-purple-400 rounded-full animate-spin" />
                 </div>
               }>

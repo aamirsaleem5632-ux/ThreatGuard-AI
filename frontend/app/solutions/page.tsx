@@ -51,10 +51,10 @@ export default function SolutionsPage() {
           return (
             <div
               key={sol.id}
-              className="p-6 rounded-2xl bg-[#0B0A10] border border-purple-500/15 hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(201,168,68,0.2)] transition-all flex flex-col justify-between space-y-4"
+              className="p-6 rounded-2xl bg-[#07110A] border border-purple-500/15 hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(104,166,109,0.2)] transition-all flex flex-col justify-between space-y-4"
             >
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#030305] border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_12px_rgba(201,168,68,0.2)]">
+                <div className="w-10 h-10 rounded-xl bg-[#030705] border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_12px_rgba(104,166,109,0.2)]">
                   <Icon className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-bold text-white">{sol.title}</h3>
