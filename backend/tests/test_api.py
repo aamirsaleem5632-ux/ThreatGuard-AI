@@ -8,6 +8,7 @@ from app.database import Base, get_db
 from app.models.all_models import Investigation, User
 import app.main as main_module
 import app.seed_data as seed_data
+from app.security.auth import hash_password
 from app.services.risk_engine import RiskEngine
 from app.services.gamification import award_completed_investigation
 
@@ -106,6 +107,7 @@ class TestThreatGuardAPI(unittest.TestCase):
         headers = self.get_auth_headers()
         alerts = self.client.get("/api/alerts", headers=headers)
         self.assertEqual(alerts.status_code, 200)
+        admin_alert_ids = {alert["id"] for alert in alerts.json()}
         alert_id = alerts.json()[0]["id"]
 
         notifications = self.client.get("/api/alerts/notifications", headers=headers)
@@ -117,6 +119,37 @@ class TestThreatGuardAPI(unittest.TestCase):
         self.assertEqual(marked.status_code, 200)
         self.assertTrue(marked.json()["is_read"])
         self.assertEqual(self.client.post(f"/api/alerts/{alert_id}/read", headers=headers).status_code, 200)
+
+        db = self.test_session_local()
+        try:
+            admin = db.query(User).filter(User.email == "admin@threatguard.ai").first()
+            second_user = User(
+                org_id=admin.org_id,
+                email="notification-second-user@enterprise-corp.com",
+                full_name="Second Notification Analyst",
+                hashed_password=hash_password("StrongPassword2026!"),
+                role="Security Analyst",
+                is_active=True,
+                account_status="active",
+            )
+            db.add(second_user)
+            db.commit()
+        finally:
+            db.close()
+
+        second_user_headers = self.get_auth_headers(
+            email="notification-second-user@enterprise-corp.com",
+            password="StrongPassword2026!",
+        )
+        second_user_notifications = self.client.get(
+            "/api/alerts/notifications",
+            headers=second_user_headers,
+        )
+        self.assertEqual(second_user_notifications.status_code, 200)
+        same_org_notification = next(
+            item for item in second_user_notifications.json() if item["id"] == alert_id
+        )
+        self.assertFalse(same_org_notification["is_read"])
 
         customer = self.client.post(
             "/api/auth/register",
@@ -132,11 +165,18 @@ class TestThreatGuardAPI(unittest.TestCase):
         customer_headers = {"Authorization": f"Bearer {customer.json()['access_token']}"}
         customer_notifications = self.client.get("/api/alerts/notifications", headers=customer_headers)
         self.assertEqual(customer_notifications.status_code, 200)
-        self.assertEqual(customer_notifications.json(), [])
+        self.assertEqual(len(customer_notifications.json()), 1)
+        self.assertEqual(
+            customer_notifications.json()[0]["title"],
+            "Autonomous SOC Initialized for Notification Isolation Analyst",
+        )
+        customer_notification_ids = {item["id"] for item in customer_notifications.json()}
+        self.assertTrue(customer_notification_ids.isdisjoint(admin_alert_ids))
 
     def test_gamification_points_only_follow_unique_completed_investigations(self):
-        headers = self.get_auth_headers()
         self.assertEqual(self.client.get("/api/gamification/me").status_code, 401)
+        self.assertEqual(self.client.get("/api/gamification/leaderboard").status_code, 401)
+        headers = self.get_auth_headers()
 
         db = self.test_session_local()
         try:

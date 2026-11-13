@@ -58,6 +58,7 @@ export interface GamificationProfile {
   level: string;
   next_level: string | null;
   points_to_next_level: number;
+  level_progress_percent: number;
   achievements: GamificationAchievement[];
   recent_rewards: GamificationReward[];
 }
