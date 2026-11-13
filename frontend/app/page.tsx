@@ -4,6 +4,7 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { useLanguage } from '@/context/LanguageContext';
+import Reveal from '@/components/common/Reveal';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -239,6 +240,7 @@ function HomeContent() {
       <section className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1: Protect Your Privacy */}
+          <Reveal className="h-full" delay={0}>
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -248,7 +250,7 @@ function HomeContent() {
               boxShadow: '0 0 25px rgba(104, 166, 109, 0.25)',
               borderColor: 'rgba(104, 166, 109, 0.40)'
             }}
-            className="cyber-glass p-7 rounded-2xl flex flex-col justify-between shadow-xl group cursor-default"
+            className="cyber-glass p-7 rounded-2xl flex flex-col justify-between shadow-xl group cursor-default h-full"
           >
             <div className="space-y-4">
               <div className="w-14 h-14 rounded-2xl bg-[#08130B] border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(104,166,109,0.2)] group-hover:border-purple-500/50 transition-colors">
@@ -275,8 +277,10 @@ function HomeContent() {
               </Link>
             </div>
           </motion.div>
+          </Reveal>
 
           {/* Card 2: Real-Time Threat Defense (Highlighted active card with glowing purple aura) */}
+          <Reveal className="h-full" delay={0.08}>
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -286,7 +290,7 @@ function HomeContent() {
               boxShadow: '0 0 35px rgba(104, 166, 109, 0.35)',
               borderColor: 'rgba(104, 166, 109, 0.6)'
             }}
-            className="cyber-glass-purple p-7 rounded-2xl flex flex-col justify-between shadow-[0_0_35px_rgba(104,166,109,0.25)] relative group cursor-default"
+            className="cyber-glass-purple p-7 rounded-2xl flex flex-col justify-between shadow-[0_0_35px_rgba(104,166,109,0.25)] relative group cursor-default h-full"
           >
             <div className="absolute -top-3 right-5 px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-mono font-bold tracking-wider uppercase">
               Primary Defense
@@ -317,8 +321,10 @@ function HomeContent() {
               </Link>
             </div>
           </motion.div>
+          </Reveal>
 
           {/* Card 3: Secure Your Identity */}
+          <Reveal className="h-full" delay={0.16}>
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -328,7 +334,7 @@ function HomeContent() {
               boxShadow: '0 0 25px rgba(98, 153, 91, 0.25)',
               borderColor: 'rgba(98, 153, 91, 0.40)'
             }}
-            className="cyber-glass p-7 rounded-2xl flex flex-col justify-between shadow-xl group cursor-default"
+            className="cyber-glass p-7 rounded-2xl flex flex-col justify-between shadow-xl group cursor-default h-full"
           >
             <div className="space-y-4">
               <div className="w-14 h-14 rounded-2xl bg-[#08130B] border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(104,166,109,0.2)] group-hover:border-purple-500/50 transition-colors">
@@ -355,6 +361,7 @@ function HomeContent() {
               </Link>
             </div>
           </motion.div>
+          </Reveal>
         </div>
       </section>
 
@@ -367,17 +374,24 @@ function HomeContent() {
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-6">
+            <Reveal>
             <div className="text-xs font-mono text-purple-300 uppercase tracking-wider font-bold">
               {t('hero.maxSecurity', '20+ Enterprise Security Defenses Active')}
             </div>
+            </Reveal>
+            <Reveal delay={0.08}>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
               {t('hero.comprehensive', 'Comprehensive Protection Against Cyberthreats')}
             </h2>
+            </Reveal>
+            <Reveal delay={0.16}>
             <p className="text-xs sm:text-sm text-zinc-400 font-mono leading-relaxed">
               From endpoint ransomware behavior to cloud IAM policy drifts and LLM prompt injections, ThreatGuard AI delivers complete, synchronized coverage across all attack vectors.
             </p>
+            </Reveal>
 
             <div className="space-y-3.5 font-mono text-xs">
+              <Reveal delay={0.24}>
               <div className="flex items-start gap-3">
                 <div className="w-5 h-5 rounded-full bg-purple-950/60 border border-purple-500/35 flex items-center justify-center text-purple-300 flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3" />
@@ -387,7 +401,9 @@ function HomeContent() {
                   <p className="text-zinc-400 text-[11px]">Autonomous CTI correlation against APT groups and zero-day exploits.</p>
                 </div>
               </div>
+              </Reveal>
 
+              <Reveal delay={0.32}>
               <div className="flex items-start gap-3">
                 <div className="w-5 h-5 rounded-full bg-purple-950/60 border border-purple-500/35 flex items-center justify-center text-purple-300 flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3" />
@@ -397,7 +413,9 @@ function HomeContent() {
                   <p className="text-zinc-400 text-[11px]">Strict OWASP Top 10 API auditing and financial data leak isolation.</p>
                 </div>
               </div>
+              </Reveal>
 
+              <Reveal delay={0.40}>
               <div className="flex items-start gap-3">
                 <div className="w-5 h-5 rounded-full bg-purple-950/60 border border-purple-500/35 flex items-center justify-center text-purple-300 flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3" />
@@ -407,8 +425,10 @@ function HomeContent() {
                   <p className="text-zinc-400 text-[11px]">Real-time MITRE ATT&CK telemetry and transparent 5-factor risk scoring.</p>
                 </div>
               </div>
+              </Reveal>
             </div>
 
+            <Reveal delay={0.48}>
             <div className="pt-2">
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-block">
                 <Link
@@ -420,9 +440,11 @@ function HomeContent() {
                 </Link>
               </motion.div>
             </div>
+            </Reveal>
           </div>
 
           {/* Laptop Preview Mockup displaying the SOC Dashboard */}
+          <Reveal className="lg:col-span-6 relative cursor-default" delay={0.08}>
           <motion.div
             whileHover={{ scale: 1.015 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -476,33 +498,38 @@ function HomeContent() {
               </div>
             </div>
           </motion.div>
+          </Reveal>
         </div>
       </motion.section>
 
       {/* 4. 12 Cybersecurity Domains Grid */}
       <section className="space-y-8">
         <div className="text-center space-y-2">
+          <Reveal>
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">
             Twelve Specialized Cybersecurity Domains
           </h2>
+          </Reveal>
+          <Reveal delay={0.08}>
           <p className="text-xs sm:text-sm text-zinc-400 font-mono max-w-2xl mx-auto">
             Every cybersecurity domain features its own dedicated dashboard, specialized AI assistant, live statistics, and autonomous remediation workflows.
           </p>
+          </Reveal>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {DOMAIN_CARDS.map((domain) => {
+          {DOMAIN_CARDS.map((domain, index) => {
             const Icon = domain.icon;
             return (
+              <Reveal key={domain.id} className="h-full" delay={index * 0.08}>
               <motion.div
-                key={domain.id}
                 whileHover={{
                   scale: 1.02,
                   boxShadow: '0 0 20px rgba(104, 166, 109, 0.25)',
                   borderColor: 'rgba(104, 166, 109, 0.40)'
                 }}
                 transition={{ type: 'spring', stiffness: 350, damping: 22 }}
-                className="rounded-2xl border border-purple-500/15 bg-[#07110A]/80 flex flex-col justify-between overflow-hidden"
+                className="rounded-2xl border border-purple-500/15 bg-[#07110A]/80 flex flex-col justify-between overflow-hidden h-full"
               >
                 <Link
                   href={`/${domain.id}`}
@@ -526,13 +553,16 @@ function HomeContent() {
                   </div>
                 </Link>
               </motion.div>
+              </Reveal>
             );
           })}
         </div>
       </section>
+      <Reveal>
       <footer className="border-t border-purple-500/15 pt-6 text-center text-xs font-mono text-zinc-400">
         © ThreatGuard AI. All rights reserved.
       </footer>
+      </Reveal>
     </div>
   );
 }

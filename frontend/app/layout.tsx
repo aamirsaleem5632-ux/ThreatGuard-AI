@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 import './globals.css';
+import 'lenis/dist/lenis.css';
 import AppShell from '@/components/layout/AppShell';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { AuthProvider } from '@/context/AuthContext';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import PWARegistration from '@/components/common/PWARegistration';
+import SmoothScroll from '@/components/common/SmoothScroll';
 
 export const metadata: Metadata = {
   title: 'ThreatGuard AI - Autonomous AI Cybersecurity & Threat Intelligence Platform',
@@ -26,6 +28,7 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className="antialiased selection:bg-purple-500/30 selection:text-purple-300 bg-[#030705] text-white" suppressHydrationWarning>
         <PWARegistration />
+        <SmoothScroll />
         <ErrorBoundary name="RootApp">
           <LanguageProvider>
             <AuthProvider>

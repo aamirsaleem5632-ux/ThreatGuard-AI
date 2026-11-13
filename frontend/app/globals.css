@@ -16,16 +16,6 @@ body {
   overflow-x: hidden;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-}
-
 /* Custom Obsidian Purple Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
