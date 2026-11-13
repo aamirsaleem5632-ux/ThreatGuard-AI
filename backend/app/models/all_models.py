@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Integer, Float, Boolean, Text, ForeignKey, DateTime, JSON
+from sqlalchemy import Column, String, Integer, Float, Boolean, Text, ForeignKey, DateTime, JSON, UniqueConstraint
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -77,6 +77,37 @@ class Alert(Base):
     created_at = Column(DateTime, default=utc_now)
 
     organization = relationship("Organization", back_populates="alerts")
+
+class AlertReadReceipt(Base):
+    __tablename__ = "alert_read_receipts"
+    __table_args__ = (
+        UniqueConstraint("user_id", "alert_id", name="uq_alert_read_receipt_user_alert"),
+    )
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    alert_id = Column(String(36), ForeignKey("alerts.id"), nullable=False, index=True)
+    read_at = Column(DateTime, default=utc_now, nullable=False)
+
+class ActivityReward(Base):
+    __tablename__ = "activity_rewards"
+    __table_args__ = (
+        UniqueConstraint(
+            "org_id",
+            "user_id",
+            "activity_type",
+            "activity_key",
+            name="uq_activity_reward_user_activity",
+        ),
+    )
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    org_id = Column(String(36), ForeignKey("organizations.id"), nullable=False, index=True)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    activity_type = Column(String(50), nullable=False)
+    activity_key = Column(String(64), nullable=False)
+    points = Column(Integer, nullable=False)
+    awarded_at = Column(DateTime, default=utc_now, nullable=False)
 
 class Incident(Base):
     __tablename__ = "incidents"

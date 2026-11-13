@@ -9,7 +9,10 @@ import {
   DomainAssistant,
   User,
   AuthResponse,
-  MessageResponse
+  MessageResponse,
+  Notification,
+  GamificationProfile,
+  LeaderboardEntry
 } from './types';
 
 // Use the live backend directly in production. NEXT_PUBLIC_API_URL may be supplied
@@ -146,53 +149,86 @@ export const api = {
   },
 
   async getAlerts(domain?: string): Promise<Alert[]> {
-    const url = domain ? `/alerts?domain=${domain}` : '/alerts';
-    return safeFetch<Alert[]>(url, [
-      {
-        id: "ALT-1",
-        domain: "threat-intelligence",
-        title: "Suspicious C2 Beaconing to Known APT29 Infrastructure",
-        description: "High-frequency outbound HTTPS beaconing detected to bulletproof IP 185.220.101.5 associated with Cozy Bear campaigns.",
-        severity: "Critical",
-        status: "Active",
-        source: "AbuseIPDB & Flow Telemetry",
-        indicator: "185.220.101.5",
-        created_at: new Date().toISOString()
-      },
-      {
-        id: "ALT-2",
-        domain: "soc",
-        title: "Kerberoasting & High-Volume Ticket Request Anomaly",
-        description: "Multiple SPN ticket requests observed for sensitive service accounts within 90 seconds from host WIN-DEV-08.",
-        severity: "Critical",
-        status: "Active",
-        source: "Active Directory Event ID 4769",
-        indicator: "svc-backup-admin",
-        created_at: new Date().toISOString()
-      },
-      {
-        id: "ALT-3",
-        domain: "vulnerabilities",
-        title: "Zero-Day RCE Exploit in Edge Firewall (CVE-2024-21413)",
-        description: "NVD CVSS v3.1 score 9.8 with actively weaponized EPSS probability 0.785 affecting public bastion listener.",
-        severity: "Critical",
-        status: "Active",
-        source: "NVD Vulnerability Feed",
-        indicator: "CVE-2024-21413",
-        created_at: new Date().toISOString()
-      },
-      {
-        id: "ALT-4",
-        domain: "phishing",
-        title: "Deceptive Typosquat Phishing Link Targetting Single-Sign-On",
-        description: "Domain evil-invoice-phish.net registered with Let's Encrypt SSL certificate mimicking corporate SSO portal.",
-        severity: "High",
-        status: "Investigating",
-        source: "URLhaus & Mail Gateway",
-        indicator: "evil-invoice-phish.net",
-        created_at: new Date().toISOString()
+    const url = domain ? `/alerts?domain=${encodeURIComponent(domain)}` : '/alerts';
+    return requestApi<Alert[]>(url);
+  },
+
+  async getNotifications(): Promise<Notification[]> {
+    return requestApi<Notification[]>('/alerts/notifications');
+  },
+
+  async markNotificationRead(alertId: string): Promise<Notification> {
+    return requestApi<Notification>(`/alerts/${encodeURIComponent(alertId)}/read`, {
+      method: 'POST'
+    });
+  },
+
+  async streamAlertNotifications(options: {
+    lastEventId?: string;
+    signal: AbortSignal;
+    onOpen: () => void;
+    onEvent: (eventId?: string) => void;
+  }): Promise<void> {
+    const token = getAuthToken();
+    const headers: Record<string, string> = { Accept: 'text/event-stream' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    if (options.lastEventId) headers['Last-Event-ID'] = options.lastEventId;
+
+    const response = await fetch(`${API_BASE}/alerts/stream`, {
+      headers,
+      credentials: 'include',
+      cache: 'no-store',
+      signal: options.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Notification stream failed with status ${response.status}`);
+    }
+    if (!response.body) {
+      throw new Error('Notification stream returned no response body');
+    }
+
+    options.onOpen();
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let eventId = options.lastEventId;
+    let hasData = false;
+
+    const processLine = (line: string) => {
+      if (line === '') {
+        if (hasData) options.onEvent(eventId);
+        hasData = false;
+        return;
       }
-    ]);
+      if (line.startsWith(':')) return;
+
+      const separator = line.indexOf(':');
+      const field = separator < 0 ? line : line.slice(0, separator);
+      const value = separator < 0 ? '' : line.slice(separator + 1).replace(/^ /, '');
+      if (field === 'id' && !value.includes('\0')) eventId = value;
+      if (field === 'data') hasData = true;
+    };
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) throw new Error('Notification stream closed');
+      buffer += decoder.decode(value, { stream: true });
+      let newline = buffer.indexOf('\n');
+      while (newline >= 0) {
+        const line = buffer.slice(0, newline).replace(/\r$/, '');
+        processLine(line);
+        buffer = buffer.slice(newline + 1);
+        newline = buffer.indexOf('\n');
+      }
+    }
+  },
+
+  async getGamificationProfile(): Promise<GamificationProfile> {
+    return requestApi<GamificationProfile>('/gamification/me');
+  },
+
+  async getGamificationLeaderboard(): Promise<LeaderboardEntry[]> {
+    return requestApi<LeaderboardEntry[]>('/gamification/leaderboard');
   },
 
   async getIncidents(): Promise<Incident[]> {
@@ -437,20 +473,24 @@ export const api = {
     ]);
   },
 
-  async chatWithAssistant(domain: string, message: string, indicatorContext?: string): Promise<{ response: string; suggested_actions: string[] }> {
-    try {
-      const res = await fetch(`${API_BASE}/assistants/${domain}/chat`, {
+  async chatWithAssistant(
+    domain: string,
+    message: string,
+    indicatorContext?: string,
+    history?: Array<{ role: 'user' | 'assistant'; content: string }>
+  ): Promise<{ response: string; suggested_actions: string[] }> {
+    return requestApi<{ response: string; suggested_actions: string[] }>(
+      `/assistants/${encodeURIComponent(domain)}/chat`,
+      {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, domain, indicator_context: indicatorContext })
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-
-    return {
-      response: `### ThreatGuard Assistant (${domain.toUpperCase()}):\nI have correlated telemetry for your query: "${message}".\n\n1. **Telemetry Status**: All sensor streams are operating at normal baseline.\n2. **Evidence Correlation**: Assessed against MITRE ATT&CK T1071 C2 and NIST CSF 2.0 controls.\n3. **Recommended Action**: Review open incidents in the Command Center and launch multi-agent investigation if new anomalous traffic is detected.`,
-      suggested_actions: ["Investigate indicator reputation", "Map to MITRE ATT&CK", "Trigger containment action"]
-    };
+        body: JSON.stringify({
+          message,
+          domain,
+          indicator_context: indicatorContext,
+          history
+        })
+      }
+    );
   },
 
   async getModuleDetails(domain: string): Promise<any> {

@@ -17,6 +17,7 @@ from app.schemas.all_schemas import (
 from app.services.intelligence_service import IntelligenceService
 from app.services.orchestrator import MultiAgentOrchestrator
 from app.security.auth import get_current_user
+from app.services.gamification import award_completed_investigation
 
 router = APIRouter(prefix="/investigations", tags=["Multi-Agent Investigations"])
 
@@ -56,6 +57,8 @@ async def create_and_run_investigation(
 
     # Execute Autonomous Multi-Agent Orchestration
     completed_investigation = await MultiAgentOrchestrator.run_investigation(investigation.id, db)
+    if completed_investigation and completed_investigation.status == "Completed":
+        award_completed_investigation(db, completed_investigation, current_user)
     return completed_investigation
 
 @router.get("/{investigation_id}", response_model=InvestigationOut)
@@ -89,6 +92,7 @@ def approve_containment_action(
         ApprovalRequest.investigation_id == inv.id,
         ApprovalRequest.status == "Pending"
     ).first()
+    eligible_completion = inv.status == "Waiting Approval" and approval is not None
     
     if approval:
         approval.status = "Approved"
@@ -107,6 +111,8 @@ def approve_containment_action(
         details=f"Human Analyst {current_user.full_name} approved containment action: {approval.action_type if approval else 'BLOCK'} on target {inv.indicator}."
     )
     db.add(audit)
+    if eligible_completion:
+        award_completed_investigation(db, inv, current_user)
     db.commit()
     db.refresh(inv)
     return inv

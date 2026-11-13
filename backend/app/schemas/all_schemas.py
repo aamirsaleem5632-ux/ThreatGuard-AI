@@ -102,6 +102,9 @@ class AlertOut(BaseModel):
     class Config:
         from_attributes = True
 
+class NotificationOut(AlertOut):
+    is_read: bool
+
 class AlertCreate(BaseModel):
     domain: str
     title: str
@@ -197,6 +200,37 @@ class ChatRequest(BaseModel):
     domain: Optional[str] = "general"
     history: Optional[List[Dict[str, str]]] = []
     indicator_context: Optional[str] = None
+
+class ActivityRewardOut(BaseModel):
+    activity_type: str
+    points: int
+    awarded_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class AchievementOut(BaseModel):
+    id: str
+    title: str
+    description: str
+    earned: bool
+
+class GamificationProfileOut(BaseModel):
+    points: int
+    completed_investigations: int
+    level: str
+    next_level: Optional[str]
+    points_to_next_level: int
+    level_progress_percent: int
+    achievements: List[AchievementOut]
+    recent_rewards: List[ActivityRewardOut]
+
+class LeaderboardEntryOut(BaseModel):
+    rank: int
+    user_id: str
+    full_name: str
+    points: int
+    level: str
 
 class ChatResponse(BaseModel):
     response: str

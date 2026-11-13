@@ -58,7 +58,8 @@ export default function AIAssistantDrawer({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    messagesEndRef.current?.scrollIntoView({ behavior });
   }, [messages, isLoading]);
 
   if (!isOpen) return null;
@@ -73,7 +74,8 @@ export default function AIAssistantDrawer({
     setIsLoading(true);
 
     try {
-      const data = await api.chatWithAssistant(selectedDomain, userMsg, activeIndicator);
+      const history = messages.map(({ role, text }) => ({ role, content: text }));
+      const data = await api.chatWithAssistant(selectedDomain, userMsg, activeIndicator, history);
       setMessages(prev => [
         ...prev,
         {

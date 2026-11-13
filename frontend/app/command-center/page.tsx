@@ -88,6 +88,31 @@ export default function CommandCenterPage() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    let requestInProgress = false;
+    const refreshAlerts = async () => {
+      if (requestInProgress || document.visibilityState === 'hidden') return;
+      requestInProgress = true;
+      try {
+        const latestAlerts = await api.getAlerts();
+        if (active) setAlerts(latestAlerts);
+      } catch (error) {
+        if (active) console.error('Unable to refresh live security alerts:', error);
+      } finally {
+        requestInProgress = false;
+      }
+    };
+
+    const intervalId = window.setInterval(refreshAlerts, 15000);
+    document.addEventListener('visibilitychange', refreshAlerts);
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', refreshAlerts);
+    };
+  }, []);
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Banner / Headline */}

@@ -21,6 +21,7 @@ from app.api.mcp import router as mcp_router
 from app.api.reports import router as reports_router
 from app.api.graph import router as graph_router
 from app.api.modules import router as modules_router
+from app.api.gamification import router as gamification_router
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,7 @@ app.include_router(mcp_router, prefix=settings.API_V1_STR)
 app.include_router(reports_router, prefix=settings.API_V1_STR)
 app.include_router(graph_router, prefix=settings.API_V1_STR)
 app.include_router(modules_router, prefix=settings.API_V1_STR)
+app.include_router(gamification_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def root():
