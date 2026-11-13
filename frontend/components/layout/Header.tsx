@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
+import { api } from '@/lib/api';
+import { Notification } from '@/lib/types';
 import LanguageSelector from '@/components/layout/LanguageSelector';
 import {
   Search,
@@ -16,7 +18,8 @@ import {
   Sparkles,
   ChevronDown,
   LogOut,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Award
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -43,9 +46,101 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
   const router = useRouter();
   const { t } = useLanguage();
   const { user, logout } = useAuth();
+  const userId = user?.id;
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationError, setNotificationError] = useState(false);
+
+  useEffect(() => {
+    if (!userId) {
+      setNotifications([]);
+      return;
+    }
+
+    let active = true;
+    let requestInProgress = false;
+    let lastEventId: string | undefined;
+    let retryDelay = 1000;
+    let retryTimeout: number | undefined;
+    let streamController: AbortController | undefined;
+    const refreshNotifications = async () => {
+      if (requestInProgress || document.visibilityState === 'hidden') return;
+      requestInProgress = true;
+      try {
+        const latest = await api.getNotifications();
+        if (active) {
+          setNotifications(latest);
+          setNotificationError(false);
+        }
+      } catch (error) {
+        if (active) {
+          setNotificationError(true);
+          console.error('Unable to refresh SOC notifications:', error);
+        }
+      } finally {
+        requestInProgress = false;
+      }
+    };
+
+    const connectToAlertStream = async () => {
+      if (!active) return;
+      const controller = new AbortController();
+      streamController = controller;
+      try {
+        await api.streamAlertNotifications({
+          lastEventId,
+          signal: controller.signal,
+          onOpen: () => {
+            retryDelay = 1000;
+            if (active) setNotificationError(false);
+          },
+          onEvent: eventId => {
+            if (eventId) lastEventId = eventId;
+            void refreshNotifications();
+          },
+        });
+      } catch (error) {
+        if (active && !controller.signal.aborted) {
+          setNotificationError(true);
+          console.error('SOC notification stream disconnected; reconnecting:', error);
+        }
+      } finally {
+        if (active && !controller.signal.aborted) {
+          retryTimeout = window.setTimeout(() => {
+            void connectToAlertStream();
+          }, retryDelay);
+          retryDelay = Math.min(retryDelay * 2, 30000);
+        }
+      }
+    };
+
+    void refreshNotifications();
+    void connectToAlertStream();
+    const intervalId = window.setInterval(refreshNotifications, 15000);
+    document.addEventListener('visibilitychange', refreshNotifications);
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+      if (retryTimeout !== undefined) window.clearTimeout(retryTimeout);
+      streamController?.abort();
+      document.removeEventListener('visibilitychange', refreshNotifications);
+    };
+  }, [userId]);
+
+  const unreadNotifications = notifications.filter(notification => !notification.is_read);
+
+  const markNotificationRead = async (alertId: string) => {
+    try {
+      await api.markNotificationRead(alertId);
+      setNotifications(current => current.map(notification =>
+        notification.id === alertId ? { ...notification, is_read: true } : notification
+      ));
+    } catch (error) {
+      console.error('Unable to mark SOC notification as read:', error);
+    }
+  };
 
   const initials = user?.full_name
     ? user.full_name
@@ -148,12 +243,16 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            aria-label="SOC Notifications"
+            aria-label={`SOC Notifications${unreadNotifications.length ? `, ${unreadNotifications.length} unread` : ''}`}
             className="w-9 h-9 rounded-lg bg-[#0B0A10] border border-purple-500/15 hover:border-purple-500/40 flex items-center justify-center text-zinc-400 hover:text-white transition-colors relative"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+            {unreadNotifications.length > 0 && (
+              <>
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+              </>
+            )}
           </button>
 
           {showNotifications && (
@@ -163,22 +262,36 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
                   {t('header.notifications', 'SOC Notifications')}
                 </span>
                 <span className="text-[10px] font-mono text-rose-400 bg-rose-950/50 px-1.5 py-0.5 rounded border border-rose-500/40">
-                  3 {t('header.criticalAlerts', 'Critical')}
+                  {unreadNotifications.length} Unread
                 </span>
               </div>
               <div className="space-y-2 text-xs">
-                <div className="p-2.5 rounded-lg bg-[#0B0A10] border-l-2 border-rose-500">
-                  <div className="font-semibold text-white">C2 Beaconing Detected</div>
-                  <div className="text-zinc-400 text-[11px] mt-0.5">Egress traffic to 185.220.101.5 flagged by AbuseIPDB sensor.</div>
-                </div>
-                <div className="p-2.5 rounded-lg bg-[#0B0A10] border-l-2 border-purple-600">
-                  <div className="font-semibold text-white">Human Approval Pending</div>
-                  <div className="text-zinc-400 text-[11px] mt-0.5">Remediation Agent requests firewall block on malicious-c2-update.org.</div>
-                </div>
-                <div className="p-2.5 rounded-lg bg-[#0B0A10] border-l-2 border-violet-500">
-                  <div className="font-semibold text-white">CVE-2024-21413 Monitored</div>
-                  <div className="text-zinc-400 text-[11px] mt-0.5">EPSS score 0.785 patch candidate identified.</div>
-                </div>
+                {notificationError && (
+                  <div className="text-[11px] text-rose-400">Unable to connect. Retrying automatically.</div>
+                )}
+                {notifications.length === 0 && !notificationError && (
+                  <div className="text-[11px] text-zinc-400">No security alerts.</div>
+                )}
+                {notifications.map(notification => (
+                  <button
+                    key={notification.id}
+                    type="button"
+                    onClick={() => void markNotificationRead(notification.id)}
+                    className={`w-full text-left p-2.5 rounded-lg border-l-2 ${
+                      notification.severity === 'Critical'
+                        ? 'border-rose-500'
+                        : notification.severity === 'High'
+                          ? 'border-amber-500'
+                          : 'border-purple-500'
+                    } ${notification.is_read ? 'bg-transparent opacity-70' : 'bg-[#0B0A10]'}`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-semibold text-white">{notification.title}</div>
+                      {!notification.is_read && <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />}
+                    </div>
+                    <div className="text-zinc-400 text-[11px] mt-0.5">{notification.description}</div>
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -223,6 +336,15 @@ function HeaderInner({ onToggleSidebar, onOpenQuickInvestigate, onToggleAssistan
               </div>
 
               <div className="space-y-1 text-xs">
+                <Link
+                  href="/gamification"
+                  onClick={() => setShowUserMenu(false)}
+                  className="flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-zinc-300 hover:text-white hover:bg-[#0B0A10] transition-colors"
+                >
+                  <Award className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Analyst Progress</span>
+                </Link>
+
                 <Link
                   href="/settings"
                   onClick={() => setShowUserMenu(false)}

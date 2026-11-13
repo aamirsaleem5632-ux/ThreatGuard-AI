@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "ThreatGuard AI",
+  "short_name": "ThreatGuard",
+  "description": "Autonomous AI cybersecurity and threat intelligence platform",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#030705",
+  "theme_color": "#030705",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

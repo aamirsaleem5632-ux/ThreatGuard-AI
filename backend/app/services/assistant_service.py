@@ -73,7 +73,19 @@ class AssistantService:
     async def _query_gemini(cls, message: str, system_prompt: str, history: List[Dict[str, str]] = None) -> str | None:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
         
-        contents = [{"role": "user", "parts": [{"text": f"System Directive: {system_prompt}\n\nUser Question: {message}"}]}]
+        contents = []
+        for item in (history or [])[-20:]:
+            role = item.get("role")
+            text = item.get("content", "")
+            if role in {"user", "assistant", "model"} and isinstance(text, str) and text.strip():
+                contents.append({
+                    "role": "model" if role == "assistant" else role,
+                    "parts": [{"text": text[:12000]}],
+                })
+        contents.append({
+            "role": "user",
+            "parts": [{"text": f"System Directive: {system_prompt}\n\nUser Question: {message}"}],
+        })
         
         async with httpx.AsyncClient(timeout=10.0) as client:
             resp = await client.post(url, json={"contents": contents})

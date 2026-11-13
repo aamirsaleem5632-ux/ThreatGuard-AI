@@ -35,6 +35,42 @@ export interface Alert {
   created_at: string;
 }
 
+export interface Notification extends Alert {
+  is_read: boolean;
+}
+
+export interface GamificationAchievement {
+  id: string;
+  title: string;
+  description: string;
+  earned: boolean;
+}
+
+export interface GamificationReward {
+  activity_type: string;
+  points: number;
+  awarded_at: string;
+}
+
+export interface GamificationProfile {
+  points: number;
+  completed_investigations: number;
+  level: string;
+  next_level: string | null;
+  points_to_next_level: number;
+  level_progress_percent: number;
+  achievements: GamificationAchievement[];
+  recent_rewards: GamificationReward[];
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  user_id: string;
+  full_name: string;
+  points: number;
+  level: string;
+}
+
 export interface Incident {
   id: string;
   title: string;

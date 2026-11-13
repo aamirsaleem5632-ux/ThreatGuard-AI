@@ -5,9 +5,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from app.main import app
 from app.database import Base, get_db
+from app.models.all_models import Investigation, User
 import app.main as main_module
 import app.seed_data as seed_data
+from app.security.auth import hash_password
 from app.services.risk_engine import RiskEngine
+from app.services.gamification import award_completed_investigation
 
 class TestThreatGuardAPI(unittest.TestCase):
     @classmethod
@@ -96,6 +99,127 @@ class TestThreatGuardAPI(unittest.TestCase):
         response = self.client.get("/api/dashboard/overview")
         self.assertEqual(response.status_code, 401)
         self.assertIn("Authentication required", response.json()["detail"])
+
+    def test_alert_notifications_are_authenticated_and_read_state_is_per_user(self):
+        self.assertEqual(self.client.get("/api/alerts/notifications").status_code, 401)
+        self.assertEqual(self.client.get("/api/alerts/stream").status_code, 401)
+
+        headers = self.get_auth_headers()
+        alerts = self.client.get("/api/alerts", headers=headers)
+        self.assertEqual(alerts.status_code, 200)
+        admin_alert_ids = {alert["id"] for alert in alerts.json()}
+        alert_id = alerts.json()[0]["id"]
+
+        notifications = self.client.get("/api/alerts/notifications", headers=headers)
+        self.assertEqual(notifications.status_code, 200)
+        notification = next(item for item in notifications.json() if item["id"] == alert_id)
+        self.assertFalse(notification["is_read"])
+
+        marked = self.client.post(f"/api/alerts/{alert_id}/read", headers=headers)
+        self.assertEqual(marked.status_code, 200)
+        self.assertTrue(marked.json()["is_read"])
+        self.assertEqual(self.client.post(f"/api/alerts/{alert_id}/read", headers=headers).status_code, 200)
+
+        db = self.test_session_local()
+        try:
+            admin = db.query(User).filter(User.email == "admin@threatguard.ai").first()
+            second_user = User(
+                org_id=admin.org_id,
+                email="notification-second-user@enterprise-corp.com",
+                full_name="Second Notification Analyst",
+                hashed_password=hash_password("StrongPassword2026!"),
+                role="Security Analyst",
+                is_active=True,
+                account_status="active",
+            )
+            db.add(second_user)
+            db.commit()
+        finally:
+            db.close()
+
+        second_user_headers = self.get_auth_headers(
+            email="notification-second-user@enterprise-corp.com",
+            password="StrongPassword2026!",
+        )
+        second_user_notifications = self.client.get(
+            "/api/alerts/notifications",
+            headers=second_user_headers,
+        )
+        self.assertEqual(second_user_notifications.status_code, 200)
+        same_org_notification = next(
+            item for item in second_user_notifications.json() if item["id"] == alert_id
+        )
+        self.assertFalse(same_org_notification["is_read"])
+
+        customer = self.client.post(
+            "/api/auth/register",
+            json={
+                "full_name": "Notification Isolation Analyst",
+                "email": "notification-isolation@enterprise-corp.com",
+                "password": "StrongPassword2026!",
+                "confirm_password": "StrongPassword2026!",
+                "organization_name": "Notification Isolation Org",
+            },
+        )
+        self.assertEqual(customer.status_code, 201)
+        customer_headers = {"Authorization": f"Bearer {customer.json()['access_token']}"}
+        customer_notifications = self.client.get("/api/alerts/notifications", headers=customer_headers)
+        self.assertEqual(customer_notifications.status_code, 200)
+        self.assertEqual(len(customer_notifications.json()), 1)
+        self.assertEqual(
+            customer_notifications.json()[0]["title"],
+            "Autonomous SOC Initialized for Notification Isolation Analyst",
+        )
+        customer_notification_ids = {item["id"] for item in customer_notifications.json()}
+        self.assertTrue(customer_notification_ids.isdisjoint(admin_alert_ids))
+
+    def test_gamification_points_only_follow_unique_completed_investigations(self):
+        self.assertEqual(self.client.get("/api/gamification/me").status_code, 401)
+        self.assertEqual(self.client.get("/api/gamification/leaderboard").status_code, 401)
+        headers = self.get_auth_headers()
+
+        db = self.test_session_local()
+        try:
+            user = db.query(User).filter(User.email == "admin@threatguard.ai").first()
+            investigation = Investigation(
+                org_id=user.org_id,
+                indicator="reward-test.example",
+                indicator_type="domain",
+                title="Gamification award test",
+                status="Waiting Approval",
+            )
+            db.add(investigation)
+            db.commit()
+            db.refresh(investigation)
+
+            self.assertFalse(award_completed_investigation(db, investigation, user))
+            investigation.status = "Completed"
+            db.commit()
+            self.assertTrue(award_completed_investigation(db, investigation, user))
+            self.assertFalse(award_completed_investigation(db, investigation, user))
+            duplicate = Investigation(
+                org_id=user.org_id,
+                indicator=" REWARD-TEST.EXAMPLE ",
+                indicator_type="domain",
+                title="Duplicate gamification award test",
+                status="Completed",
+            )
+            db.add(duplicate)
+            db.commit()
+            self.assertFalse(award_completed_investigation(db, duplicate, user))
+        finally:
+            db.close()
+
+        profile = self.client.get("/api/gamification/me", headers=headers)
+        self.assertEqual(profile.status_code, 200)
+        self.assertEqual(profile.json()["points"], 10)
+        self.assertEqual(profile.json()["completed_investigations"], 1)
+        self.assertEqual(profile.json()["level"], "Analyst I")
+        self.assertEqual(profile.json()["level_progress_percent"], 10)
+
+        leaderboard = self.client.get("/api/gamification/leaderboard", headers=headers)
+        self.assertEqual(leaderboard.status_code, 200)
+        self.assertEqual(leaderboard.json()[0]["points"], 10)
 
     def test_login_success_and_authenticated_dashboard(self):
         login_res = self.client.post(
