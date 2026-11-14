@@ -1,4 +1,4 @@
-import {
+﻿import {
   OverviewStats,
   PostureScoreData,
   ModuleProgress,
@@ -552,6 +552,25 @@ export const api = {
     });
   },
 
+  async getReportInvestigations(): Promise<Investigation[]> {
+    return requestApi<Investigation[]>('/investigations');
+  },
+
+  async generateReport(payload: {
+    report_type: string;
+    investigation_id: string;
+  }): Promise<{
+    title: string;
+    type: string;
+    generated_at: string;
+    content: string;
+  }> {
+    return requestApi('/reports/generate', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
   async resetPassword(payload: { token: string; new_password: string; confirm_password?: string }): Promise<MessageResponse> {
     return requestApi<MessageResponse>('/auth/reset-password', {
       method: 'POST',
@@ -559,3 +578,4 @@ export const api = {
     });
   }
 };
+

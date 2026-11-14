@@ -1,13 +1,25 @@
+﻿from datetime import datetime, timezone
+from typing import Any
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from datetime import datetime, timezone
-from typing import Dict, Any, List
+from sqlalchemy.orm import Session, selectinload
+
 from app.database import get_db
-from app.models.all_models import Investigation, User, Alert, Incident
+from app.models.all_models import Investigation, User
 from app.schemas.all_schemas import ReportGenerateRequest
 from app.security.auth import get_current_user
 
 router = APIRouter(prefix="/reports", tags=["Reporting & Compliance"])
+
+ALLOWED_REPORT_TYPES = {"executive", "technical", "incident", "compliance"}
+
+
+def format_datetime(value: Any) -> str:
+    if not value:
+        return "Not recorded"
+    return value.isoformat() if hasattr(value, "isoformat") else str(value)
+
 
 @router.post("/generate")
 def generate_report(
@@ -15,48 +27,164 @@ def generate_report(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    inv = None
-    if payload.investigation_id:
-        inv = db.query(Investigation).filter(Investigation.id == payload.investigation_id).first()
+    report_type = (payload.report_type or "").lower().strip()
 
-    target_title = inv.indicator if inv else "Enterprise Security Posture"
-    
-    report_content = f"""# THREATGUARD AI - SECURITY INTELLIGENCE REPORT
-**Generated At:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}
-**Classification:** TLP:AMBER | STRICTLY CONFIDENTIAL
-**Report Type:** {payload.report_type.upper()} SUMMARY
-**Target Scope:** {target_title}
+    if report_type not in ALLOWED_REPORT_TYPES:
+        raise HTTPException(status_code=400, detail="Invalid report type.")
 
----
+    if not payload.investigation_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Select an investigation before generating a report."
+        )
 
-## 1. Executive Summary
-This report summarizes autonomous security investigations and telemetry correlation executed by ThreatGuard AI for {current_user.email}.
-All findings have been enriched through global intelligence feeds (AbuseIPDB, URLhaus, NVD, MITRE ATT&CK) and validated by multi-agent consensus.
+    investigation = (
+        db.query(Investigation)
+        .options(
+            selectinload(Investigation.evidence),
+            selectinload(Investigation.agent_runs),
+            selectinload(Investigation.approval_requests),
+        )
+        .filter(
+            Investigation.id == payload.investigation_id,
+            Investigation.org_id == current_user.org_id
+        )
+        .first()
+    )
 
-## 2. Threat & Risk Metrics
-- **Assessed Risk Score:** {inv.risk_score if inv else '78.5'} / 100 ({inv.severity if inv else 'High'})
-- **Calculated Verdict:** {inv.verdict if inv else 'Active Security Operations Baseline'}
-- **MITRE ATT&CK Mapping:** {inv.mitre_technique if inv else 'T1071 - Application Layer Protocol'}
-- **Attributed Threat Actor:** {inv.threat_actor if inv else 'APT29 / Unattributed'}
+    if not investigation:
+        raise HTTPException(
+            status_code=404,
+            detail="Investigation not found or access denied."
+        )
 
-## 3. Evidence & Telemetry Findings
-- Multi-factor correlation confirms threat reputation weight contribution: 35%.
-- Dual-signature sandbox validation detected beaconing anomalies on non-standard ports.
-- Verified containment workflows staged under Human-in-the-Loop governance.
+    evidence_records = investigation.evidence or []
+    agent_runs = investigation.agent_runs or []
+    approval_records = investigation.approval_requests or []
 
-## 4. Mandatory Remediation Checklist
-1. Enforce edge firewall drop on indicator `{inv.indicator if inv else '185.220.101.5'}`.
-2. Terminate associated active user sessions and reset credentials.
-3. Validate host memory dumps with EDR telemetry sensors.
-4. Verify organizational compliance posture against NIST CSF 2.0 PR.AC controls.
+    generated_at = datetime.now(timezone.utc)
 
----
-*Report certified by ThreatGuard AI Autonomous Reporting Engine.*
-"""
+    lines = [
+        "# THREATGUARD AI - SECURITY INVESTIGATION REPORT",
+        "",
+        f"**Generated At:** {generated_at.strftime('%Y-%m-%d %H:%M:%S UTC')}",
+        f"**Report Type:** {report_type.upper()}",
+        "**Source:** Stored investigation records",
+        "**Classification:** Confidential",
+        "",
+        "---",
+        "",
+        "## 1. Investigation Overview",
+        "",
+        f"- **Title:** {investigation.title}",
+        f"- **Indicator:** {investigation.indicator}",
+        f"- **Indicator Type:** {investigation.indicator_type}",
+        f"- **Status:** {investigation.status}",
+        f"- **Risk Score:** {investigation.risk_score}",
+        f"- **Severity:** {investigation.severity}",
+        f"- **Verdict:** {investigation.verdict}",
+        f"- **MITRE Technique:** {investigation.mitre_technique or 'Not recorded'}",
+        f"- **Threat Actor:** {investigation.threat_actor or 'Not recorded'}",
+        f"- **Created At:** {format_datetime(investigation.created_at)}",
+        f"- **Completed At:** {format_datetime(investigation.completed_at)}",
+        "",
+        "### Investigation Summary",
+        investigation.evidence_summary or "No investigation summary is stored.",
+        "",
+        "---",
+        "",
+        "## 2. Evidence and Telemetry Records",
+        "",
+    ]
+
+    if evidence_records:
+        for index, evidence in enumerate(evidence_records, 1):
+            lines.extend([
+                f"### Evidence {index}",
+                f"- **Source:** {evidence.source}",
+                f"- **Factor:** {evidence.factor}",
+                f"- **Score Contribution:** {evidence.score_contribution}",
+                f"- **Confidence:** {evidence.confidence}",
+                f"- **Recorded At:** {format_datetime(evidence.created_at)}",
+                f"- **Finding:** {evidence.finding}",
+                "",
+            ])
+    else:
+        lines.append("No evidence records are stored for this investigation.")
+        lines.append("")
+
+    lines.extend([
+        "---",
+        "",
+        "## 3. AI Agent Execution Records",
+        "",
+    ])
+
+    if agent_runs:
+        for index, agent in enumerate(agent_runs, 1):
+            lines.extend([
+                f"### Agent Run {index}",
+                f"- **Agent:** {agent.agent_name}",
+                f"- **Status:** {agent.status}",
+                f"- **Started At:** {format_datetime(agent.created_at)}",
+                f"- **Finished At:** {format_datetime(agent.finished_at)}",
+                f"- **Logs:** {agent.logs or 'No logs stored.'}",
+            ])
+
+            if agent.tool_calls:
+                lines.append(
+                    "**Tool Calls:** " +
+                    json.dumps(agent.tool_calls, ensure_ascii=False, default=str)
+                )
+            else:
+                lines.append("**Tool Calls:** No tool calls stored.")
+
+            lines.append("")
+    else:
+        lines.append("No agent execution records are stored.")
+        lines.append("")
+
+    lines.extend([
+        "---",
+        "",
+        "## 4. Approval and Response Records",
+        "",
+    ])
+
+    if approval_records:
+        for index, approval in enumerate(approval_records, 1):
+            lines.extend([
+                f"### Approval Record {index}",
+                f"- **Action:** {approval.action_type}",
+                f"- **Target:** {approval.target}",
+                f"- **Description:** {approval.description}",
+                f"- **Impact Level:** {approval.impact_level}",
+                f"- **Status:** {approval.status}",
+                f"- **Requested By:** {approval.requester_agent}",
+                f"- **Approved By:** {approval.approved_by or 'Not recorded'}",
+                f"- **Requested At:** {format_datetime(approval.requested_at)}",
+                f"- **Decided At:** {format_datetime(approval.decided_at)}",
+                "",
+            ])
+    else:
+        lines.append("No approval records are stored for this investigation.")
+        lines.append("")
+
+    lines.extend([
+        "---",
+        "",
+        "## 5. Report Notes",
+        "",
+        "- This report is generated from records stored for the selected investigation.",
+        "- Missing information is identified as not recorded; no findings are fabricated.",
+        "- This is a system-generated report and is not digitally signed or legally certified.",
+    ])
+
+    report_content = "\n".join(lines)
 
     return {
-        "title": f"{payload.report_type.capitalize()} Briefing - {target_title}",
-        "type": payload.report_type,
-        "generated_at": datetime.now(timezone.utc),
-        "content": report_content
+        "title": f"{report_type.capitalize()} Report - {investigation.title}",
+        "type": report_type,
+        "generated_at": generated_at,
+        "content": report_content,
     }
