@@ -66,7 +66,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
   const isReportsActive = pathname === '/reports' || !!pathname?.startsWith('/reports/');
 
   return (
-    <aside className={`w-72 max-w-[85vw] bg-[#080714]/95 border-r border-purple-500/15 backdrop-blur-xl flex flex-col h-screen fixed left-0 top-0 z-50 select-none transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+    <aside className={`w-72 max-w-[85vw] bg-[#080714]/95 border-r border-purple-500/15 backdrop-blur-xl flex flex-col h-screen overflow-hidden overscroll-contain fixed left-0 top-0 z-50 select-none transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
       {/* Brand Logo with Obsidian Purple Glow */}
       <div className="p-4 border-b border-purple-500/15 flex items-center justify-between shrink-0">
         <Link href="/command-center"
@@ -88,7 +88,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
       </div>
 
       {/* Navigation Groups */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-6 custom-scrollbar">
+      <div data-lenis-prevent className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-4 space-y-6 custom-scrollbar" onWheel={(e) => { const el = e.currentTarget; if (el.scrollHeight > el.clientHeight) { e.stopPropagation(); el.scrollTop += e.deltaY; } }}>
         {/* Core Command Center */}
         <div>
           <div className="text-[11px] font-mono tracking-wider text-zinc-500 uppercase px-3 mb-2 flex items-center justify-between">
