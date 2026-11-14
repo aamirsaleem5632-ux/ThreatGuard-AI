@@ -63,6 +63,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
   const { logout } = useAuth();
 
   const isActive = (href: string) => pathname === href;
+  const isReportsActive = pathname === '/reports' || !!pathname?.startsWith('/reports/');
 
   return (
     <aside className={`w-72 max-w-[85vw] bg-[#080714]/95 border-r border-purple-500/15 backdrop-blur-xl flex flex-col h-screen fixed left-0 top-0 z-50 select-none transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
@@ -169,6 +170,21 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
                 <span>{t('nav.investigations', 'Investigations')}</span>
               </div>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-950/60 text-purple-300 border border-purple-500/30">DEMO</span>
+            </Link>
+
+            <Link
+              href="/reports"
+              onClick={onClose}
+              className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
+                isReportsActive
+                  ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.2)] font-bold'
+                  : 'text-zinc-300 hover:bg-[#0B0A10] hover:text-white'
+              }`}
+            >
+              <div className="flex items-center space-x-2.5">
+                <FileText className="w-3.5 h-3.5 text-purple-400" />
+                <span>{t('nav.reports', 'Reports')}</span>
+              </div>
             </Link>
 
             <Link
