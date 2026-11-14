@@ -59,7 +59,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isQuickInvestigateOpen, setIsQuickInvestigateOpen] = useState(false);
-  const [showIntelRail, setShowIntelRail] = useState(false);
+  const [showIntelRail, setShowIntelRail] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const isMarketing = MARKETING_ROUTES.some(
