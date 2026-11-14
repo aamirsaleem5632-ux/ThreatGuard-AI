@@ -68,7 +68,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
   return (
     <aside className={`w-72 max-w-[85vw] bg-[#080714]/95 border-r border-purple-500/15 backdrop-blur-xl flex flex-col h-screen fixed left-0 top-0 z-50 select-none transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
       {/* Brand Logo with Obsidian Purple Glow */}
-      <div className="p-4 border-b border-purple-500/15 flex items-center justify-between">
+      <div className="p-4 border-b border-purple-500/15 flex items-center justify-between shrink-0">
         <Link href="/command-center"
             onClick={onClose} className="flex items-center space-x-3 group">
           <div className="w-10 h-10 rounded-xl bg-[#030305] border border-purple-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(147,51,234,0.25)] group-hover:border-purple-500/50 transition-colors">
@@ -88,7 +88,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
       </div>
 
       {/* Navigation Groups */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 custom-scrollbar">
+      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-6 custom-scrollbar">
         {/* Core Command Center */}
         <div>
           <div className="text-[11px] font-mono tracking-wider text-zinc-500 uppercase px-3 mb-2 flex items-center justify-between">
@@ -177,7 +177,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
               onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
                 isReportsActive
-                  ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.2)] font-bold'
+                  ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
                   : 'text-zinc-300 hover:bg-[#0B0A10] hover:text-white'
               }`}
             >
@@ -227,21 +227,6 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
           </div>
           <div className="space-y-1">
             <Link
-              href="/reports"
-              onClick={onClose}
-              className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
-                isActive('/reports')
-                  ? 'bg-purple-950/50 text-purple-200 border border-purple-500/30 font-semibold'
-                  : 'text-zinc-300 hover:bg-[#0B0A10] hover:text-white'
-              }`}
-            >
-              <div className="flex items-center space-x-2.5">
-                <FileText className="w-3.5 h-3.5 text-zinc-400" />
-                <span>{t('nav.reports', 'Executive Reports')}</span>
-              </div>
-            </Link>
-
-            <Link
               href="/settings"
               onClick={onClose}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-none ${
@@ -260,7 +245,7 @@ function SidebarInner({ isOpen, onClose }: SidebarProps) {
       </div>
 
       {/* Footer Return to Public Site */}
-      <div className="relative p-3 border-t border-purple-500/15 bg-[#030305]/95 overflow-hidden">
+      <div className="relative p-3 border-t border-purple-500/15 bg-[#030305]/95 overflow-hidden shrink-0">
         {/* Ambient Fluid Purple/Violet Wave at bottom-left */}
         <div className="absolute -bottom-6 -left-6 w-32 h-24 pointer-events-none opacity-40 blur-[1px]">
           <svg viewBox="0 0 120 90" fill="none" className="w-full h-full">
